@@ -28,6 +28,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
 import { handleToast } from "../../utils/helpers";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   username: "",
@@ -105,6 +106,7 @@ const UserSettings = () => {
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
@@ -121,7 +123,7 @@ const UserSettings = () => {
     updateMutation.mutate(newValues, {
       onSuccess: (data) => {
         queryClient.setQueryData(["users", loggedInUsername], data);
-        handleToast("success", "Cập nhật thông tin thành công");
+        handleToast("success", t("Cập nhật thông tin thành công"));
       },
       onError: (error) => {
         console.log(error);
@@ -161,7 +163,7 @@ const UserSettings = () => {
             <form onSubmit={handleSubmit}>
               <Box textAlign="center" mb="30px">
                 <Typography fontWeight="bold" variant="h3">
-                  Chỉnh sửa thông tin cá nhân
+                  {t("Chỉnh sửa thông tin cá nhân")}
                 </Typography>
               </Box>
               <Box
@@ -178,7 +180,7 @@ const UserSettings = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Họ"
+                  label={t("Họ")}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.firstName}
@@ -195,7 +197,7 @@ const UserSettings = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Tên"
+                  label={t("Tên")}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.lastName}
@@ -212,7 +214,7 @@ const UserSettings = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Địa chỉ email"
+                  label={t("Địa chỉ email")}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.email}
@@ -229,7 +231,7 @@ const UserSettings = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Số điện thoại"
+                  label={t("Số điện thoại")}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.phone}
@@ -249,7 +251,7 @@ const UserSettings = () => {
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
                       format="dd/MM/yyyy"
-                      label="Ngày sinh"
+                      label={t("Ngày sinh")}
                       maxDate={new Date()}
                       value={parse(values.dob, "yyyy-MM-dd", new Date())}
                       onChange={(newDate) => {
@@ -289,7 +291,7 @@ const UserSettings = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Địa chỉ"
+                  label={t("Địa chỉ")}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.address !== null ? values.address : ""}
@@ -307,7 +309,7 @@ const UserSettings = () => {
                   }}
                 >
                   <FormLabel color="warning" id="gender">
-                    Giới tính
+                    {t("Giới tính")}
                   </FormLabel>
                   <RadioGroup
                     row
@@ -320,7 +322,7 @@ const UserSettings = () => {
                   >
                     <FormControlLabel
                       value="false"
-                      label="Nam"
+                      label={t("Nam")}
                       control={
                         <Radio
                           sx={{
@@ -334,7 +336,7 @@ const UserSettings = () => {
                     />
                     <FormControlLabel
                       value="true"
-                      label="Nữ"
+                      label={t("Nữ")}
                       control={
                         <Radio
                           sx={{
@@ -364,7 +366,7 @@ const UserSettings = () => {
                     loading={updateMutation.isLoading}
                     startIcon={<SaveAsOutlinedIcon />}
                   >
-                    "Lưu"
+                    {t("Lưu")}
                   </LoadingButton>
                 </Box>
               </Box>

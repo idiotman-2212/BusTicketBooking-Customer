@@ -24,6 +24,7 @@ import {
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   username: "",
@@ -45,6 +46,7 @@ const ChangePassword = () => {
   const colors = tokens();
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
+  const {t}  = useTranslation();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const changePwdMutation = useMutation({
     mutationFn: (changePwdRequest) => authApi.changePwd(changePwdRequest),
@@ -100,7 +102,7 @@ const ChangePassword = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Đổi mật khẩu
+                  {t("Đổi mật khẩu")}
                 </Typography>
               </Box>
 
@@ -111,7 +113,7 @@ const ChangePassword = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Tài khoản *"
+                label={t("Tài khoản *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -133,12 +135,12 @@ const ChangePassword = () => {
                   error={!!touched.newPassword && !!errors.newPassword}
                   htmlFor="outlined-adornment-password"
                 >
-                  Mật khẩu mới *
+                  {t("Mật khẩu mới *")}
                 </InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
                   type={showPwd ? "text" : "password"}
-                  label="Mật khẩu *"
+                  label={t("Mật khẩu *")}
                   fullWidth
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -172,12 +174,12 @@ const ChangePassword = () => {
                   error={!!touched.reNewPassword && !!errors.reNewPassword}
                   htmlFor="outlined-adornment-password"
                 >
-                  Nhập lại mật khẩu mới *
+                  {t("Nhập lại mật khẩu mới *")}
                 </InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
                   type={showPwd ? "text" : "password"}
-                  label="Mật khẩu *"
+                  label={t("Mật khẩu *")}
                   fullWidth
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -209,7 +211,7 @@ const ChangePassword = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Đổi mật khẩu
+                  {t("Đổi mật khẩu")}
                 </Button>
               </Box>
             </Box>

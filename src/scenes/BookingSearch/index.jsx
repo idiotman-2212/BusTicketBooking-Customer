@@ -17,6 +17,7 @@ import * as bookingApi from "../../queries/booking/ticketQueries";
 import { tokens } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
+import { useTranslation } from "react-i18next";
 
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
@@ -25,6 +26,7 @@ const getFormattedPaymentDateTime = (paymentDateTime) => {
   );
 };
 
+//lấy giá sau khi áp mã
 const getBookingPrice = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -48,19 +50,23 @@ const BookingSearch = () => {
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(-1);
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
+  //truy vấn booking theo sđt
   const bookingSearchQuery = useQuery({
     queryKey: ["bookings", "all", searchPhone],
     queryFn: () => bookingApi.getAllByPhone(searchPhone),
     enabled: !isInValidPhone && searchPhone !== "",
   });
 
+  //lấy chi tiết vé đặt 
   const bookingDetailQuery = useQuery({
     queryKey: ["bookings", selectedTicket],
     queryFn: () => bookingApi.getBooking(selectedTicket),
     enabled: selectedTicket >= 0,
   });
 
+  //kiểm tra sđt có hợp lệ 
   const checkValidPhone = (phone) => {
     if (phone !== "") {
       if (!APP_CONSTANTS.PHONE_REGEX.test(phone)) {
@@ -78,6 +84,7 @@ const BookingSearch = () => {
     checkValidPhoneDebounced(phone);
   };
 
+  //lọc và sắp xếp vé theo thời gian 
   const filterTickets = (ticketList) => {
     if (ticketList?.length === 0) return ticketList;
 
@@ -102,26 +109,31 @@ const BookingSearch = () => {
     return finalTickets;
   };
 
+  //lấy trạng thái thanh toán
   const getPaymentStatusObject = (paymentStatus) => {
     switch (paymentStatus) {
       case "UNPAID":
-        return { title: "Chưa thanh toán", color: "warning" };
+        return { title: t("Chưa thanh toán"), color: "warning" };
       case "PAID":
-        return { title: "Đã thanh toán", color: "success" };
+        return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
+<<<<<<< HEAD
         return { title: "Đã hủy vé", color: "error" };
+=======
+        return { title: t("Đã hủy vé"), color: "error" };
+>>>>>>> 2c868a3 (update ssm)
     }
   };
 
   const getStatusText = (historyStatus) => {
-    if (historyStatus === null) return "Tạo mới";
+    if (historyStatus === null) return t("Tạo mới");
     switch (historyStatus) {
       case "UNPAID":
-        return "Chưa thanh toán";
+        return t("Chưa thanh toán");
       case "PAID":
-        return "Đã thanh toán";
+        return t("Đã thanh toán");
       case "CANCEL":
-        return "Đã hủy vé";
+        return t("Đã hủy vé");
     }
   };
 
@@ -146,7 +158,7 @@ const BookingSearch = () => {
           value={searchPhone}
           onChange={handleSearchPhoneChange}
           id="phone"
-          label="Số điện thoại"
+          label={t("Số điện thoại")}
           variant="standard"
           error={isInValidPhone}
           helperText={isInValidPhone && messages.phone.invalid}
@@ -209,18 +221,18 @@ const BookingSearch = () => {
                     >
                       <Box>
                         <Typography component="span" variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
                           {`${trip.source.name}
                            ${`\u21D2`}
                          ${trip.destination.name}`}
                         </Typography>
                         <Typography variant="h6">
                           {" "}
-                          <span style={{ fontWeight: "bold" }}>Xe: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
                           {trip.coach.coachType}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
+                          <span style={{ fontWeight: "bold" }}>{t("Ngày đi")}: </span>{" "}
                           {format(
                             parse(
                               trip.departureDateTime,
@@ -231,7 +243,7 @@ const BookingSearch = () => {
                           )}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ghế: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                           {seatNumber}
                         </Typography>
                       </Box>
@@ -268,7 +280,7 @@ const BookingSearch = () => {
               variant="h2"
               fontWeight="bold"
             >
-              Không có kết quả
+              {t("Không có kết quả")}
             </Typography>
           </Box>
         )
@@ -307,21 +319,21 @@ const BookingSearch = () => {
               <>
                 <Box>
                   <Typography mb="40px" variant="h3" fontWeight="bold">
-                    THÔNG TIN VÉ ĐẶT
+                    {t("THÔNG TIN VÉ ĐẶT")}
                   </Typography>
                   <Typography component="span" variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
                     {`${bookingDetailQuery.data.trip.source.name}
                            ${`\u21D2`}
                          ${bookingDetailQuery.data.trip.destination.name}`}
                   </Typography>
                   <Typography variant="h6">
                     {" "}
-                    <span style={{ fontWeight: "bold" }}>Xe: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
                     {`${bookingDetailQuery.data.trip.coach.name} ${bookingDetailQuery.data.trip.coach.coachType}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
+                    <span style={{ fontWeight: "bold" }}>{t("Ngày đi")}: </span>{" "}
                     {format(
                       parse(
                         bookingDetailQuery.data.trip.departureDateTime,
@@ -332,13 +344,13 @@ const BookingSearch = () => {
                     )}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Giá vé: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Giá vé")}: </span>
                     {`${formatCurrency(
                       getBookingPrice(bookingDetailQuery.data.trip)
                     )}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Ghế: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                     {bookingDetailQuery.data.seatNumber}
                   </Typography>
                 </Box>
@@ -348,7 +360,7 @@ const BookingSearch = () => {
                   gap="15px"
                 >
                   <Divider sx={{ gridColumn: "span 4" }}>
-                    Thông tin hành khách
+                    {t("Thông tin hành khách")}
                   </Divider>
                   <TextField
                     color="warning"
@@ -356,7 +368,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Họ"
+                    label={t("Họ")}
                     value={bookingDetailQuery.data.custFirstName}
                     name="custFirstName"
                     InputProps={{
@@ -372,7 +384,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Tên"
+                    label={t("Tên")}
                     value={bookingDetailQuery.data.custLastName}
                     name="custLastName"
                     InputProps={{
@@ -388,7 +400,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Số điện thoại"
+                    label={t("Số điện thoại")}
                     value={bookingDetailQuery.data.phone}
                     name="phone"
                     InputProps={{
@@ -404,7 +416,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Email"
+                    label={t("Email")}
                     value={bookingDetailQuery.data.email ?? "Không có"}
                     name="email"
                     InputProps={{
@@ -420,7 +432,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Địa chỉ đón"
+                    label={t("Địa chỉ đón")}
                     value={bookingDetailQuery.data.pickUpAddress}
                     name="pickUpAddress"
                     InputProps={{
@@ -431,7 +443,7 @@ const BookingSearch = () => {
                     }}
                   />
                   <Divider sx={{ gridColumn: "span 4", mt: "20px" }}>
-                    Thông tin thanh toán
+                    {t("Thông tin thanh toán")}
                   </Divider>
                   <TextField
                     color="warning"
@@ -439,7 +451,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Phương thức thanh toán"
+                    label={t("Phương thức thanh toán")}
                     value={
                       bookingDetailQuery.data.paymentMethod === "CASH"
                         ? "Tiền mặt"
@@ -459,7 +471,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Trạng thái thanh toán"
+                    label={t("Trạng thái thanh toán")}
                     value={
                       bookingDetailQuery.data.paymentStatus === "UNPAID"
                         ? "Chưa thanh toán"
@@ -481,7 +493,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Ngày thanh toán"
+                    label={t("Ngày thanh toán")}
                     value={getFormattedPaymentDateTime(
                       bookingDetailQuery.data.paymentDateTime
                     )}
@@ -499,7 +511,7 @@ const BookingSearch = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Tổng tiền thanh toán"
+                    label={t("Tổng tiền thanh toán")}
                     value={formatCurrency(bookingDetailQuery.data.totalPayment)}
                     name="totalPayment"
                     InputProps={{
@@ -513,7 +525,7 @@ const BookingSearch = () => {
               </>
             )}
           </Box>
-          <Divider sx={{ width: "100%" }}>Lịch sử thanh toán</Divider>
+          <Divider sx={{ width: "100%" }}>{t("Lịch sử thanh toán")}</Divider>
           {/* payment history */}
           <Box>
             {bookingDetailQuery?.data && (

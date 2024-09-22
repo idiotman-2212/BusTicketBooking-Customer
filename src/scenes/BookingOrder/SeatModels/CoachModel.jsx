@@ -6,9 +6,11 @@ import Bed_Limousine_Seat_Data from "../SeatModels/Bed_Limousine_Seat_Data";
 import SeatModel from "../SeatModels/SeatModel";
 import * as bookingApi from "../../../queries/booking/ticketQueries";
 import { tokens } from "../../../theme";
+import { useTranslation } from "react-i18next";
 
 const MAX_SEAT_SELECT = 5;
 
+//lấy giá cuối cùng của chuyến đi
 const getBookingPrice = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -29,7 +31,9 @@ const CoachModel = (props) => {
   );
   const coachType = bookingData.trip.coach.coachType;
   const price = getBookingPrice(bookingData.trip);
+  const {t} = useTranslation();
 
+  // lấy thông tin ghế đã đặt
   const seatBookingQuery = useQuery({
     queryKey: ["bookings", bookingData.trip.id, bookingData.bookingDateTime],
     queryFn: () =>
@@ -39,6 +43,7 @@ const CoachModel = (props) => {
       ),
   });
 
+  //lưu ghế đặt vào danh sách ghế đã đặt
   const handleSeatOrdered = (orderedBookings) => {
     const orderedSeats = [];
     if (orderedBookings?.length === 0) return orderedSeats;
@@ -49,6 +54,7 @@ const CoachModel = (props) => {
   };
   const orderedSeats = handleSeatOrdered(seatBookingQuery?.data ?? []);
 
+  //Cập nhật trạng thái khi một ghế được chọn hoặc bỏ chọn và cập nhật số lượng ghế đã chọn và tổng tiền.
   const handleSeatChoose = useCallback(
     (seatNumber, STAIR, isSelected, isOrdered) => {
       // if chosen seat is ordered then do nothing
@@ -129,7 +135,7 @@ const CoachModel = (props) => {
               color: "#000",
             }}
           />
-          <Typography fontWeight="bold">Đã đặt</Typography>
+          <Typography fontWeight="bold">{t("Đã đặt")}</Typography>
         </Box>
         <Box textAlign="center">
           <SquareIcon
@@ -140,7 +146,7 @@ const CoachModel = (props) => {
               color: "#979797",
             }}
           />
-          <Typography fontWeight="bold">Trống</Typography>
+          <Typography fontWeight="bold">{t("Trống")}</Typography>
         </Box>
         <Box textAlign="center">
           <SquareIcon
@@ -151,7 +157,7 @@ const CoachModel = (props) => {
               color: "#ff4138",
             }}
           />
-          <Typography fontWeight="bold">Đang chọn</Typography>
+          <Typography fontWeight="bold">{t("Đang chọn")}</Typography>
         </Box>
       </Box>
 
@@ -197,12 +203,12 @@ const CoachModel = (props) => {
       >
         <Typography variant="h5">
           <span style={{ fontWeight: "bold" }}>
-            Đã chọn: {numberOfSelectedSeats} / {MAX_SEAT_SELECT} chỗ
+            {t("Đã chọn")}: {numberOfSelectedSeats} / {MAX_SEAT_SELECT} {t("chỗ")}
           </span>
         </Typography>
         <Typography variant="h5">
           <span style={{ fontWeight: "bold" }}>
-            Tổng tiền: {formatCurrency(price * numberOfSelectedSeats)}
+            {t("Tổng tiền")}: {formatCurrency(price * numberOfSelectedSeats)}
           </span>
         </Typography>
       </Box>

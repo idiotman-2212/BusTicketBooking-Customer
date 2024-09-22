@@ -3,51 +3,55 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import PasswordIcon from '@mui/icons-material/Password';
 import LockResetIcon from '@mui/icons-material/LockReset';
+import { useTranslation } from "react-i18next";
 
-const UserDrawerItems = [
+const UserDrawerItems =()=> {
+    const {t} = useTranslation();
+    return[
     {
-        label: "Đăng nhập",
+        label: t("Đăng nhập"),
         code: "login",
         to: "/login",
         icon: VpnKeyOutlinedIcon,
         requireLogin: false
     },
     {
-        label: "Chỉnh sửa thông tin",
+        label: t("Chỉnh sửa thông tin"),
         code: "edit_profile",
         to: "/settings",
         icon: SettingsOutlinedIcon,
         requireLogin: true
     },
     {
-        label: "Đổi mật khẩu",
+        label: t("Đổi mật khẩu"),
         code: "change_password",
         to: "/change-password",
         icon: PasswordIcon,
         requireLogin: true
     },
     {
-        label: "Đăng xuất",
+        label: t("Đăng xuất"),
         code: "logout",
         to: "/logout",
         icon: LogoutOutlinedIcon,
         requireLogin: true
     },
     {
-        label: "Đăng ký",
+        label: t("Đăng ký"),
         code: "register",
         to: "/register",
         icon: LogoutOutlinedIcon,
         requireLogin: false
     },
     {
-        label: "Quên mật khẩu",
+        label: t("Quên mật khẩu"),
         code: "forgot",
         to: "/forgot",
         icon: LockResetIcon,
         requireLogin: false
     },
-
 ]
+
+}
 
 export default UserDrawerItems

@@ -1,3 +1,4 @@
+//giảm tần suất gọi hàm, tăng hiệu suất hiển thị
 export const debounce = (fn, delay) => {
     let timeoutId;
     return (...args) => {

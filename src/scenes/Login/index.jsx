@@ -23,6 +23,7 @@ import { debounce } from "../../utils/debounce";
 import { handleToast } from "../../utils/helpers";
 import useLogin from "../../utils/useLogin";
 import { messages } from "../../utils/validationMessages";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   username: "",
@@ -55,6 +56,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = useLogin();
+  const {t} = useTranslation();
 
   const loginMutation = useMutation({
     mutationFn: (authReq) => authApi.login(authReq),
@@ -65,7 +67,7 @@ const Login = () => {
       onSuccess: (data) => {
         const accessToken = data.token;
         localStorage.setItem("accessToken", accessToken);
-        handleToast("success", "Đăng nhập thành công");
+        handleToast("success", t("Đăng nhập thành công"));
         // get user info
         localStorage.setItem("loggedInUsername", values.username);
 
@@ -76,7 +78,7 @@ const Login = () => {
       onError: (error) => {
         console.log(error);
         if (error.response?.status === 403) {
-          handleToast("error", "Mật khẩu sai");
+          handleToast("error", t("Mật khẩu sai"));
         } else handleToast("error", error.response?.data?.message);
       },
     });
@@ -116,7 +118,7 @@ const Login = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Đăng nhập
+                  {t("Đăng nhập")}
                 </Typography>
               </Box>
 
@@ -126,7 +128,7 @@ const Login = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Tài khoản *"
+                label={t("Tài khoản *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -148,12 +150,12 @@ const Login = () => {
                   error={!!touched.password && !!errors.password}
                   htmlFor="outlined-adornment-password"
                 >
-                  Mật khẩu *
+                  {t("Mật khẩu *")}
                 </InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
                   type={showPwd ? "text" : "password"}
-                  label="Mật khẩu *"
+                  label={t("Mật khẩu *")}
                   fullWidth
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -185,7 +187,7 @@ const Login = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Đăng nhập
+                  {t("Đăng nhập")}
                 </Button>
               </Box>
 
@@ -200,22 +202,22 @@ const Login = () => {
               >
                 <Box>
                   <Typography component="span" variant="h5">
-                    Chưa có tài khoản ?
+                    {t("Chưa có tài khoản ?")}
                     <Link to="/register" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Đăng ký
+                        {t("Đăng ký")}
                       </Typography>
                     </Link>
                   </Typography>
                 </Box>
                 <Box>
                   <Typography component="span" variant="h5">
-                    Quên mật khẩu ?
+                    {t("Quên mật khẩu ?")}
                     <Link to="/forgot" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Khôi phục
+                        {t("Khôi phục")}
                       </Typography>
                     </Link>
                   </Typography>

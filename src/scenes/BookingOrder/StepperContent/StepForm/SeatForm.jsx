@@ -3,12 +3,14 @@ import { format, parse } from "date-fns";
 import React from "react";
 import CoachModel from "../../SeatModels/CoachModel";
 import { tokens } from "../../../../theme";
+import { useTranslation } from "react-i18next";
 
 const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const colors = tokens();
-
+  const {t} = useTranslation
   const { bookingDateTime, trip } = bookingData;
 
+  //lấy giá cuối cùng sau khi áp mã
   const getBookingPriceString = (trip) => {
     let finalPrice = trip.price;
     if (!isNaN(trip?.discount?.amount)) {

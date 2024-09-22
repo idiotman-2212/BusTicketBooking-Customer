@@ -20,6 +20,7 @@ import { tokens } from "../../../../theme";
 import useLogin from "../../../../utils/useLogin";
 import { useQuery } from "@tanstack/react-query";
 import * as userApi from "../../../../queries/user/userQueries";
+import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -28,6 +29,7 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
+//lấy giá cuối cùng sau khi áp mã
 const getBookingPrice = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -41,11 +43,13 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
-
+ const {t}  =useTranslation();
+    //kiểm tra đã thanh toán thẻ chưa
   const [cardPaymentSelect, setCardPaymentSelect] = useState(
     bookingData.paymentMethod === "CARD" ? true : false
   );
 
+  //nếu người dùng đã đăng nhập thì lấy thông tin của người dùng
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
 
@@ -87,37 +91,37 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           gap="10px"
         >
           <Typography variant="h4" fontWeight="bold" mb="16px">
-            Thông tin vé đặt
+            {t("Thông tin vé đặt")}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
             {`${trip.source.name} ${
               bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
             } ${trip.destination.name}`}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Xe: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
             {trip.coach.name}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Loại: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Loại")}: </span>
             {trip.coach.coachType}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Ngày giờ đi: </span>{" "}
+            <span style={{ fontWeight: "bold" }}>{t("Ngày giờ đi")}: </span>{" "}
             {format(
               parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
               "HH:mm dd-MM-yyyy"
             )}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Tổng tiền: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Tổng tiền")}: </span>
             {`${formatCurrency(totalPayment)} (${
               seatNumber.length
             } x ${formatCurrency(getBookingPrice(trip))})`}
           </Typography>
           <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>Ghế: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
             {seatNumber.join(", ")}
           </Typography>
         </Box>
@@ -136,7 +140,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Họ *"
+            label={t("Họ *")}
             onBlur={handleBlur}
             onChange={(e) => setFieldValue("firstName", e.target.value)}
             value={values.firstName}
@@ -155,7 +159,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Tên *"
+            label={t("Tên *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.lastName}
@@ -174,7 +178,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Điện thoại *"
+            label={t("Điện thoại *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.phone}
@@ -193,7 +197,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Địa chỉ email *"
+            label={t("Địa chỉ email *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.email}
@@ -212,7 +216,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Địa chỉ đón *"
+            label={t("Địa chỉ đón *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.pickUpAddress}
@@ -231,7 +235,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }}
           >
             <FormLabel color="warning" id="paymentMethod">
-              Phương thức thanh toán
+              {t("Phương thức thanh toán")}
             </FormLabel>
             <RadioGroup
               row
@@ -259,7 +263,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     }}
                   />
                 }
-                label="Tiền mặt"
+                label={t("Tiền mặt")}
               />
               <FormControlLabel
                 value="CARD"
@@ -273,12 +277,12 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     }}
                   />
                 }
-                label="Thẻ visa"
+                label={t("Thẻ visa")}
               />
             </RadioGroup>
             {!cardPaymentSelect && (
               <FormHelperText sx={{ fontStyle: "italic", fontSize: "12px" }}>
-                * Nhận vé và thanh toán tại quầy
+                {t("* Nhận vé và thanh toán tại quầy")}
               </FormHelperText>
             )}
           </FormControl>
@@ -340,7 +344,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Tên chủ thẻ *"
+            label={t("Tên chủ thẻ *")}
             onBlur={handleBlur}
             onChange={(e) => setFieldValue("nameOnCard", e.target.value)}
             value={values.nameOnCard}
@@ -360,7 +364,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Số thẻ *"
+            label={t("Số thẻ *")}
             onBlur={handleBlur}
             onChange={(e) => setFieldValue("cardNumber", e.target.value)}
             value={values.cardNumber}
@@ -383,7 +387,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="MM/yy"
-                label="Ngày hết hạn"
+                label={t("Ngày hết hạn")}
                 views={["year", "month"]}
                 openTo="month"
                 minDate={new Date()}
@@ -421,7 +425,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="CVV *"
+            label={t("CVV *")}
             onBlur={handleBlur}
             onChange={(e) => setFieldValue("cvv", e.target.value)}
             value={values.cvv}

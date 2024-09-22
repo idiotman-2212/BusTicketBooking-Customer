@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Typography, colors } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../utils/helpers";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   email: "",
@@ -35,6 +36,7 @@ const forotSchema = yup.object().shape({
 const ForgotPwd = () => {
   const colors = tokens();
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const forgotPwdMutation = useMutation({
     mutationFn: (email) => authApi.forgot(email),
@@ -87,7 +89,7 @@ const ForgotPwd = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Khôi phục mật khẩu
+                  {t("Khôi phục mật khẩu")}
                 </Typography>
               </Box>
               <TextField
@@ -96,7 +98,7 @@ const ForgotPwd = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Địa chỉ email *"
+                label={t("Địa chỉ email *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -116,7 +118,7 @@ const ForgotPwd = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Gửi email
+                  {t("Gửi email")}
                 </Button>
               </Box>
 
@@ -131,22 +133,22 @@ const ForgotPwd = () => {
               >
                 <Box>
                   <Typography component="span" variant="h5">
-                    Đã có tài khoản ?
+                    {t("Đã có tài khoản ?")}
                     <Link to="/login" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Đăng nhập
+                        {t("Đăng nhập")}
                       </Typography>
                     </Link>
                   </Typography>
                 </Box>
                 <Box>
                   <Typography component="span" variant="h5">
-                    Chưa có tài khoản ?
+                    {t("Chưa có tài khoản ?")}
                     <Link to="/register" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Đăng ký
+                        {t("Đăng ký")}
                       </Typography>
                     </Link>
                   </Typography>

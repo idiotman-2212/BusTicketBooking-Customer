@@ -23,6 +23,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { handleToast } from "../../utils/helpers";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   firstName: "",
@@ -79,6 +80,7 @@ const Register = () => {
   const colors = tokens();
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   // create register mutation
   const registerMutation = useMutation({
@@ -92,7 +94,7 @@ const Register = () => {
     registerMutation.mutate(newValues, {
       onSuccess: (data) => {
         console.log(data.token);
-        handleToast("success", "Đăng ký tài khoản thành công");
+        handleToast("success", t("Đăng ký tài khoản thành công"));
 
         navigate("/login");
       },
@@ -137,7 +139,7 @@ const Register = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Đăng ký
+                  {t("Đăng ký")}
                 </Typography>
               </Box>
 
@@ -147,7 +149,7 @@ const Register = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Họ *"
+                label={t("Họ *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.firstName}
@@ -164,7 +166,7 @@ const Register = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Tên *"
+                label={t("Tên *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.lastName}
@@ -181,7 +183,7 @@ const Register = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Địa chỉ email *"
+                label={t("Địa chỉ email *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -198,7 +200,7 @@ const Register = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Số điện thoại *"
+                label={t("Số điện thoại *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.phone}
@@ -216,7 +218,7 @@ const Register = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Tài khoản *"
+                label={t("Tài khoản *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -238,12 +240,12 @@ const Register = () => {
                   error={!!touched.password && !!errors.password}
                   htmlFor="outlined-adornment-password"
                 >
-                  Mật khẩu *
+                  {t("Mật khẩu *")}
                 </InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
                   type={showPwd ? "text" : "password"}
-                  label="Mật khẩu *"
+                  label={t("Mật khẩu *")}
                   fullWidth
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -276,12 +278,12 @@ const Register = () => {
                   error={!!touched.rePassword && !!errors.rePassword}
                   htmlFor="outlined-adornment-rePassword"
                 >
-                  Nhập lại mật khẩu *
+                  {t("Nhập lại mật khẩu *")}
                 </InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-rePassword"
                   type={showPwd ? "text" : "password"}
-                  label="Mật khẩu *"
+                  label={t("Mật khẩu *")}
                   fullWidth
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -313,7 +315,7 @@ const Register = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Đăng ký
+                  {t("Đăng ký")}
                 </Button>
               </Box>
 
@@ -328,22 +330,22 @@ const Register = () => {
               >
                 <Box>
                   <Typography component="span" variant="h5">
-                    Đã có tài khoản ?
+                    {t("Đã có tài khoản ?")}
                     <Link to="/login" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Đăng nhập
+                        {t("Đăng nhập")}
                       </Typography>
                     </Link>
                   </Typography>
                 </Box>
                 <Box>
                   <Typography component="span" variant="h5">
-                    Quên mật khẩu ?
+                    {t("Quên mật khẩu ?")}
                     <Link to="/forgot" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Khôi phục
+                        {t("Khôi phục")}
                       </Typography>
                     </Link>
                   </Typography>

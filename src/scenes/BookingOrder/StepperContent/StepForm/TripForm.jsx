@@ -27,6 +27,7 @@ import {
   Slider,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -40,6 +41,8 @@ import * as provinceApi from "../../../../queries/province/provinceQueries";
 import * as tripApi from "../../../../queries/trip/tripQueries";
 import { tokens } from "../../../../theme";
 import debounce from "lodash.debounce";
+import { useTranslation } from "react-i18next";
+
 
 const getBookingPriceString = (trip) => {
   let finalPrice = trip.price;
@@ -66,6 +69,7 @@ const MIN_PRICE_DISTANCE = 10_000;
 
 const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const colors = tokens();
+  const {t} = useTranslation();
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [findClicked, setFindClicked] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1);
@@ -87,6 +91,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     field;
 
   // prepare data (province, trip, ...) for autocomplete combobox
+  // lấy ds tỉnh
   const provinceQuery = useQuery({
     queryKey: ["provinces", "all"],
     queryFn: () => provinceApi.getAll(),
@@ -94,6 +99,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   });
 
   // prepare find trip query
+  //lấy ds các chuyến ứng với điểm nguồn và đích
   const findTripQuery = useQuery({
     queryKey: [
       "trips",
@@ -113,6 +119,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     enabled: !!selectedSource && !!selectedDestination && findClicked,
   });
 
+  //mở autocomplete tỉnh thành
   const handleProvinceOpen = () => {
     if (!provinceQuery.data) {
       setProvinceClicked(true);
@@ -124,6 +131,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   };
 
   // handle error when route is not selected
+  //chọn tuyến đường
   const handleSelectedRoute = () => {
     if (selectedSource === null) {
       formik.setFieldTouched("source", true);
@@ -138,12 +146,14 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   };
 
   // HANDLE SWAP LOCATION
+  //hoán đổi địa điểm
   const handleSwapLocation = () => {
     // setFindClicked(false);
     setSelectedSource(selectedDestination);
     setSelectedDestination(selectedSource);
   };
 
+  //lọc giờ đi
   const handleTimeBoxChange = (startTime, endTime) => {
     if (prevTimeBox.current?.startTime === startTime) {
       prevTimeBox.current = {};
@@ -154,6 +164,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
   };
 
+  //sự kiện lọc giá
   const handlePriceChange = (event, newValue, activeThumb) => {
     if (!Array.isArray(newValue)) {
       return;
@@ -174,6 +185,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
   };
 
+  //lọc giờ đi 
   const filterTrips = (originalTrips) => {
     let filteredTrips = [];
 
@@ -335,7 +347,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               <TextField
                 {...params}
                 name="source"
-                label="Điểm đi"
+                label={t("Điểm đi")}
                 color="warning"
                 size="small"
                 fullWidth
@@ -382,7 +394,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               <TextField
                 {...params}
                 name="destination"
-                label="Điểm đến"
+                label={t("Điểm đến")}
                 color="warning"
                 size="small"
                 fullWidth
@@ -421,7 +433,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="dd/MM/yyyy"
-                label="From"
+                label={t("From")}
                 minDate={new Date()}
                 value={parse(values.from, "yyyy-MM-dd", new Date())}
                 onChange={(newDate) => {
@@ -457,7 +469,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 format="dd/MM/yyyy"
-                label="To"
+                label={t("To")}
                 minDate={parse(values.from, "yyyy-MM-dd", new Date())}
                 value={parse(values.to, "yyyy-MM-dd", new Date())}
                 onChange={(newDate) => {
@@ -507,7 +519,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }
             startIcon={<SearchIcon />}
           >
-            Tìm
+            {t("Tìm")}
           </LoadingButton>
 
           {/* return time */}
@@ -589,13 +601,13 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               fontWeight="bold"
               color={colors.greenAccent[600]}
             >
-              BỘ LỌC ({tripList.length})
+              {t("BỘ LỌC")} ({tripList.length})
             </Typography>
           </Box>
           <Divider />
           {/* departure time filter */}
           <Typography m="10px 0" variant="h5" pl="10px">
-            Giờ đi
+            {t("Giờ đi")}
           </Typography>
           <Box
             display="grid"
@@ -618,7 +630,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 cursor: "pointer",
               }}
             >
-              <Typography>Sáng sớm</Typography>
+              <Typography>{t("Sáng sớm")}</Typography>
               <Typography>00:00 - 06:00</Typography>
             </Box>
             <Box
@@ -636,7 +648,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 cursor: "pointer",
               }}
             >
-              <Typography>Buổi sáng</Typography>
+              <Typography>{t("Buổi sáng")}</Typography>
               <Typography>06:01 - 12:00</Typography>
             </Box>
             <Box
@@ -654,7 +666,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 cursor: "pointer",
               }}
             >
-              <Typography>Buổi chiều</Typography>
+              <Typography>{t("Buổi chiều")}</Typography>
               <Typography>12:01 - 18:00</Typography>
             </Box>
             <Box
@@ -672,14 +684,14 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 cursor: "pointer",
               }}
             >
-              <Typography>Buổi tối</Typography>
+              <Typography>{t("Buổi tối")}</Typography>
               <Typography>18:01 - 23:59</Typography>
             </Box>
           </Box>
 
           {/* price filter */}
           <Typography m="10px 0" variant="h5" pl="10px">
-            Giá vé
+            {t("Giá vé")}
           </Typography>
           <Box
             display="flex"
@@ -750,7 +762,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     <Box display="flex" flexDirection="column">
                       <CardContent sx={{ flex: "1 0 auto" }}>
                         <Typography variant="h5" fontStyle="italic">
-                          Ngày giờ đi
+                          {t("Ngày giờ đi")}
                         </Typography>
                         <Typography variant="h4" mt="5px" fontWeight="bold">
                           {format(
@@ -763,10 +775,10 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           )}
                         </Typography>
                         <Typography mt="5px" variant="h6">
-                          Thời lượng di chuyển:{" "}
+                          {t("Thời lượng di chuyển")}:{" "}
                           {trip.duration
-                            ? trip.duration + " tiếng"
-                            : "Chưa xác định"}
+                            ? trip.duration + t(" tiếng")
+                            : t("Chưa xác định")}
                         </Typography>
                         <Box
                           display="flex"
@@ -793,10 +805,10 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                             color={colors.greyAccent[600]}
                           >{`\u25CF`}</Typography>
                           <Typography variant="h5">
-                            Còn lại:{" "}
+                            {t("Còn lại")}:{" "}
                             {trip.coach.capacity -
                               numberOrderedSeats[trip.id]?.length}{" "}
-                            chỗ
+                            {t("chỗ")}
                           </Typography>
                         </Box>
                       </CardContent>
@@ -836,7 +848,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           sx={{ width: "30px", height: "30px" }}
                         />
                       )}
-                      <Typography>Chọn</Typography>
+                      <Typography>{t("Chọn")}</Typography>
                     </Box>
                   </Card>
                 );
@@ -860,7 +872,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                   height: "100px",
                 }}
               />
-              <Typography variant="h4">Không tìm thấy</Typography>
+              <Typography variant="h4">{t("Không tìm thấy")}</Typography>
             </Box>
           )}
         </Box>

@@ -15,6 +15,7 @@ import * as bookingApi from "../../../queries/booking/ticketQueries";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
 // import Header from "../../../components/Header";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: -1,
@@ -79,7 +80,7 @@ const renderStepContent = (
         />
       );
     default:
-      return <Typography variant="h4"> Not found</Typography>;
+      return <Typography variant="h4"> Không tìm thấy</Typography>;
   }
 };
 
@@ -90,6 +91,7 @@ const StepperBooking = () => {
   const [bookingData, setBookingData] = useState(initialValues);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
+  const {t} = useTranslation();
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -122,7 +124,7 @@ const StepperBooking = () => {
     createMutation.mutate(newValues, {
       onSuccess: () => {
         actions.resetForm();
-        handleToast("success", "Add new Bookings successfully");
+        handleToast("success", t("Thêm đặt chỗ mới thành công"));
       },
       onError: (error) => {
         console.log(error);
@@ -165,7 +167,7 @@ const StepperBooking = () => {
             alignItems="center"
             mt="50px"
           >
-            <Typography variant="h1">Cảm ơn quý khách</Typography>
+            <Typography variant="h1">{t("Cảm ơn quý khách")}</Typography>
           </Box>
         ) : (
           <Formik
@@ -194,7 +196,7 @@ const StepperBooking = () => {
                       variant="contained"
                       onClick={handleBack}
                     >
-                      Trở lại
+                      {t("Quay lại")}
                     </Button>
                   )}
                   <LoadingButton
@@ -208,7 +210,7 @@ const StepperBooking = () => {
                     loading={isSubmitting}
                     startIcon={<SaveAsOutlinedIcon />}
                   >
-                    {!isLastStep ? "Tiếp" : "Đặt vé"}
+                    {!isLastStep ? t("Tiếp") : t("Đặt vé")}
                   </LoadingButton>
                 </Box>
               </form>

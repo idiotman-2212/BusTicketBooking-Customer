@@ -17,6 +17,7 @@ import * as bookingApi from "../../queries/booking/ticketQueries";
 import { tokens } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
+import { useTranslation } from "react-i18next";
 
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
@@ -48,6 +49,7 @@ const MyTicket = () => {
   const [selectedTicket, setSelectedTicket] = useState(-1);
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   const bookingSearchQuery = useQuery({
     queryKey: ["bookings", "all", "user", loggedInUsername],
@@ -79,23 +81,27 @@ const MyTicket = () => {
   const getPaymentStatusObject = (paymentStatus) => {
     switch (paymentStatus) {
       case "UNPAID":
-        return { title: "Chưa thanh toán", color: "warning" };
+        return { title: t("Chưa thanh toán"), color: "warning" };
       case "PAID":
-        return { title: "Đã thanh toán", color: "success" };
+        return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
+<<<<<<< HEAD
         return { title: "Đã hủy vé", color: "error" };
+=======
+        return { title: t("Đã hủy vé"), color: "error" };
+>>>>>>> 2c868a3 (update ssm)
     }
   };
 
   const getStatusText = (historyStatus) => {
-    if (historyStatus === null) return "Tạo mới";
+    if (historyStatus === null) return t("Tạo mới");
     switch (historyStatus) {
       case "UNPAID":
-        return "Chưa thanh toán";
+        return t("Chưa thanh toán");
       case "PAID":
-        return "Đã thanh toán";
+        return t("Đã thanh toán");
       case "CANCEL":
-        return "Đã hủy vé";
+        return t("Đã hủy vé");
     }
   };
 
@@ -114,7 +120,7 @@ const MyTicket = () => {
       alignItems="center"
     >
       <Typography variant="h2" fontWeight="bold">
-        Vé của bạn
+        {t("Vé của bạn")}
       </Typography>
       {bookingSearchQuery?.data ? (
         sortedTickets.length !== 0 ? (
@@ -163,18 +169,18 @@ const MyTicket = () => {
                     >
                       <Box>
                         <Typography component="span" variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
                           {`${trip.source.name}
                            ${`\u21D2`}
                          ${trip.destination.name}`}
                         </Typography>
                         <Typography variant="h6">
                           {" "}
-                          <span style={{ fontWeight: "bold" }}>Xe: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
                           {trip.coach.coachType}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ngày đi: </span>{" "}
+                          <span style={{ fontWeight: "bold" }}>{t("Ngày đi")}: </span>{" "}
                           {format(
                             parse(
                               trip.departureDateTime,
@@ -185,7 +191,7 @@ const MyTicket = () => {
                           )}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>Ghế: </span>
+                          <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                           {seatNumber}
                         </Typography>
                       </Box>
@@ -223,7 +229,7 @@ const MyTicket = () => {
               variant="h2"
               fontWeight="bold"
             >
-              Không có kết quả
+              {t("Không có kết quả")}
             </Typography>
           </Box>
         )
@@ -263,21 +269,21 @@ const MyTicket = () => {
               <>
                 <Box>
                   <Typography mb="40px" variant="h3" fontWeight="bold">
-                    THÔNG TIN VÉ ĐẶT
+                    {t("THÔNG TIN VÉ ĐẶT")}
                   </Typography>
                   <Typography component="span" variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Tuyến: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
                     {`${bookingDetailQuery.data.trip.source.name}
                            ${`\u21D2`}
                          ${bookingDetailQuery.data.trip.destination.name}`}
                   </Typography>
                   <Typography variant="h6">
                     {" "}
-                    <span style={{ fontWeight: "bold" }}>Xe: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
                     {`${bookingDetailQuery.data.trip.coach.name} ${bookingDetailQuery.data.trip.coach.coachType}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Ngày giờ đi: </span>{" "}
+                    <span style={{ fontWeight: "bold" }}>{t("Ngày giờ đi")}: </span>{" "}
                     {format(
                       parse(
                         bookingDetailQuery.data.trip.departureDateTime,
@@ -288,13 +294,13 @@ const MyTicket = () => {
                     )}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Giá vé: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Giá vé")}: </span>
                     {`${formatCurrency(
                       getBookingPrice(bookingDetailQuery.data.trip)
                     )}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>Ghế: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                     {bookingDetailQuery.data.seatNumber}
                   </Typography>
                 </Box>
@@ -304,7 +310,7 @@ const MyTicket = () => {
                   gap="15px"
                 >
                   <Divider sx={{ gridColumn: "span 4" }}>
-                    Thông tin hành khách
+                    {t("Thông tin hành khách")}
                   </Divider>
                   <TextField
                     color="warning"
@@ -312,7 +318,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Họ"
+                    label={t("Họ")}
                     value={bookingDetailQuery.data.custFirstName}
                     name="custFirstName"
                     InputProps={{
@@ -328,7 +334,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Tên"
+                    label={t("Tên")}
                     value={bookingDetailQuery.data.custLastName}
                     name="custLastName"
                     InputProps={{
@@ -344,7 +350,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Số điện thoại"
+                    label={t("Số điện thoại")}
                     value={bookingDetailQuery.data.phone}
                     name="phone"
                     InputProps={{
@@ -360,7 +366,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Email"
+                    label={t("Email")}
                     value={bookingDetailQuery.data.email ?? "Không có"}
                     name="email"
                     InputProps={{
@@ -376,7 +382,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Địa chỉ đón"
+                    label={t("Địa chỉ đón")}
                     value={bookingDetailQuery.data.pickUpAddress}
                     name="pickUpAddress"
                     InputProps={{
@@ -387,7 +393,7 @@ const MyTicket = () => {
                     }}
                   />
                   <Divider sx={{ gridColumn: "span 4", mt: "20px" }}>
-                    Thông tin thanh toán
+                    {t("Thông tin thanh toán")}
                   </Divider>
                   <TextField
                     color="warning"
@@ -395,7 +401,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Phương thức thanh toán"
+                    label={t("Phương thức thanh toán")}
                     value={
                       bookingDetailQuery.data.paymentMethod === "CASH"
                         ? "Tiền mặt"
@@ -415,7 +421,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Trạng thái thanh toán"
+                    label={t("Trạng thái thanh toán")}
                     value={
                       bookingDetailQuery.data.paymentStatus === "UNPAID"
                         ? "Chưa thanh toán"
@@ -437,7 +443,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Ngày thanh toán"
+                    label={t("Ngày thanh toán")}
                     value={getFormattedPaymentDateTime(
                       bookingDetailQuery.data.paymentDateTime
                     )}
@@ -455,7 +461,7 @@ const MyTicket = () => {
                     fullWidth
                     variant="outlined"
                     type="text"
-                    label="Tổng tiền thanh toán"
+                    label={t("Tổng tiền thanh toán")}
                     value={formatCurrency(bookingDetailQuery.data.totalPayment)}
                     name="totalPayment"
                     InputProps={{
@@ -469,7 +475,7 @@ const MyTicket = () => {
               </>
             )}
           </Box>
-          <Divider sx={{ width: "100%" }}>Lịch sử thanh toán</Divider>
+          <Divider sx={{ width: "100%" }}>{t("Lịch sử thanh toán")}</Divider>
           {/* payment history */}
           <Box>
             {bookingDetailQuery?.data && (
