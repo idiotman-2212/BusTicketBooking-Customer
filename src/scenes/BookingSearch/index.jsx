@@ -117,11 +117,7 @@ const BookingSearch = () => {
       case "PAID":
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
-<<<<<<< HEAD
-        return { title: "Đã hủy vé", color: "error" };
-=======
         return { title: t("Đã hủy vé"), color: "error" };
->>>>>>> 2c868a3 (update ssm)
     }
   };
 

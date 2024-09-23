@@ -104,10 +104,6 @@ const Topbar = () => {
       alignItems="center"
       p="12px 30px"
       bgcolor="#b4b0b0"
-<<<<<<< HEAD
-      
-=======
->>>>>>> 2c868a3 (update ssm)
     >
       <Box
         sx={{
