@@ -55,7 +55,7 @@ const getAvailableBooking = async () => {
 }
 
 const createNewBookings = async (newBookings) => {
-    const resp = await http.post("/bookings", newBookings)
+    const resp = await http.post("/bookings/site1", newBookings)
     return resp.data
 }
 

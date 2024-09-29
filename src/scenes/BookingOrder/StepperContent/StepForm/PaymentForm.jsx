@@ -8,8 +8,13 @@ import {
   InputAdornment,
   Radio,
   RadioGroup,
+  useTheme,
   TextField,
   Typography,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -20,6 +25,7 @@ import { tokens } from "../../../../theme";
 import useLogin from "../../../../utils/useLogin";
 import { useQuery } from "@tanstack/react-query";
 import * as userApi from "../../../../queries/user/userQueries";
+import * as loyaltyApi from "../../../../queries/loyalty/loyaltyQueries"; // Add loyalty API
 import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount) => {
@@ -40,24 +46,55 @@ const getBookingPrice = (trip) => {
 
 const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const colors = tokens();
+  const theme = useTheme(); // use theme for controlling z-index and other styles
   const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
- const {t}  =useTranslation();
-    //kiểm tra đã thanh toán thẻ chưa
+  const { t } = useTranslation();
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Hàm format cho điểm xu (chuyển đổi sang đơn vị tiền tệ)
+  const formatPointsToCurrency = (points) => {
+    return formatCurrency(points);
+  };
+
+  //kiểm tra đã thanh toán thẻ chưa
   const [cardPaymentSelect, setCardPaymentSelect] = useState(
     bookingData.paymentMethod === "CARD" ? true : false
   );
+
+  // Phương thức thanh toán được chọn
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+
+  // Loyalty points (xu) state
+  const [availablePoints, setAvailablePoints] = useState(0);
+  const [pointsToUse, setPointsToUse] = useState(""); // Ensure pointsToUse defaults to 0
+  const [finalTotalPayment, setFinalTotalPayment] = useState(totalPayment);
 
   //nếu người dùng đã đăng nhập thì lấy thông tin của người dùng
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
 
+  // lấy thông tin user
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
     queryFn: () => userApi.getUser(loggedInUsername),
     enabled: isLoggedIn && loggedInUsername !== null,
   });
+
+  // lấy điểm tích xu
+  const loyaltyPointsQuery = useQuery({
+    queryKey: ["loyaltyPoints"],
+    queryFn: () => loyaltyApi.getLoyaltyPoints(),
+    enabled: isLoggedIn && loggedInUsername !== null,
+  });
+
+  useEffect(() => {
+    if (loyaltyPointsQuery.data) {
+      setAvailablePoints(loyaltyPointsQuery.data.loyaltyPoints);
+    }
+  }, [loyaltyPointsQuery.data]);
 
   useEffect(() => {
     if (userInfoQuery?.data) {
@@ -70,6 +107,52 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
       setFieldValue("pickUpAddress", address);
     }
   }, [userInfoQuery.data, loggedInUsername]);
+
+  // Áp dụng xu vào tổng tiền
+  const applyLoyaltyPoints = () => {
+    let pointsToApply = parseFloat(pointsToUse);
+    if (
+      isNaN(pointsToApply) ||
+      pointsToApply <= 0 ||
+      pointsToApply > availablePoints
+    ) {
+      setErrorMessage(
+        t("Số điểm không hợp lệ hoặc vượt quá số điểm có thể sử dụng.")
+      );
+      return;
+    }
+
+    setErrorMessage("");
+    const discountAmount = pointsToApply;
+    const newTotal = Math.max(bookingData.totalPayment - discountAmount, 0);
+    setFinalTotalPayment(newTotal);
+  };
+
+  // Hàm xử lý khi thanh toán
+  const handlePayment = () => {
+    if (!selectedPaymentMethod) {
+      alert("Vui lòng chọn phương thức thanh toán.");
+      return;
+    }
+
+    // Logic xử lý cho từng phương thức thanh toán
+    switch (selectedPaymentMethod) {
+      case "VNPAY":
+        console.log("Đang xử lý thanh toán qua VNPay...");
+        break;
+      case "MOMO":
+        console.log("Đang xử lý thanh toán qua MoMo...");
+        break;
+      case "BANK":
+        console.log("Đang xử lý thanh toán qua ngân hàng...");
+        break;
+      case "CREDIT_CARD":
+        console.log("Đang xử lý thanh toán qua thẻ tín dụng...");
+        break;
+      default:
+        console.error("Phương thức thanh toán không hợp lệ.");
+    }
+  };
 
   return (
     <>
@@ -190,7 +273,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }}
           />
 
-          {/* email*/}
+          {/* email */}
           <TextField
             color="warning"
             size="small"
@@ -228,215 +311,102 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }}
           />
 
-          {/* payment method */}
-          <FormControl
+          {/* Điểm Xu */}
+          <Box
             sx={{
-              gridColumn: cardPaymentSelect ? "span 4" : "span 2",
+              gridColumn: "span 4",
+              mt: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
             }}
           >
-            <FormLabel color="warning" id="paymentMethod">
-              {t("Phương thức thanh toán")}
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="paymentMethod"
-              name="row-radio-buttons-group"
-              value={values.paymentMethod}
+            <Typography variant="h6" sx={{ marginBottom: "12px" }}>
+              {t("Số điểm xu của bạn")}: {formatCurrency(availablePoints)}
+            </Typography>
+            <TextField
+              type="text" // Thay đổi kiểu nhập để tránh vấn đề với input number
+              label={t("Số điểm xu muốn sử dụng")}
+              value={pointsToUse}
               onChange={(e) => {
-                const paymentMethod = e.target.value;
-                setCardPaymentSelect(paymentMethod === "CARD" ? true : false);
-                setFieldValue("paymentMethod", paymentMethod);
-                if (paymentMethod === "CASH") {
-                  setFieldValue("paymentStatus", "UNPAID");
-                } else setFieldValue("paymentStatus", "PAID");
+                const value = e.target.value;
+                // Chỉ cho phép người dùng nhập số
+                if (value === "" || (!isNaN(value) && parseFloat(value) >= 0)) {
+                  setPointsToUse(value);
+                }
               }}
+            />
+            <FormHelperText error>{errorMessage}</FormHelperText>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={applyLoyaltyPoints}
+              disabled={
+                parseFloat(pointsToUse) <= 0 ||
+                isNaN(parseFloat(pointsToUse)) ||
+                parseFloat(pointsToUse) > availablePoints
+              } // Thêm điều kiện để vô hiệu hóa nút
             >
-              <FormControlLabel
-                value="CASH"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label={t("Tiền mặt")}
-              />
-              <FormControlLabel
-                value="CARD"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label={t("Thẻ visa")}
-              />
-            </RadioGroup>
-            {!cardPaymentSelect && (
-              <FormHelperText sx={{ fontStyle: "italic", fontSize: "12px" }}>
-                {t("* Nhận vé và thanh toán tại quầy")}
+              {t("Áp dụng điểm xu")}
+            </Button>
+
+            {/* Hiển thị tổng tiền sau khi giảm */}
+            <Typography variant="h6">
+              {t("Tổng tiền sau khi giảm")}:{" "}
+              {formatPointsToCurrency(finalTotalPayment)}
+            </Typography>
+          </Box>
+
+          {/* Tổng tiền cần thanh toán */}
+          <Typography
+            component="span"
+            variant="h6"
+            sx={{ gridColumn: "span 4" }}
+          >
+            <span style={{ fontWeight: "bold" }}>
+              {t("Tổng tiền cần thanh toán")}:{" "}
+            </span>
+            {formatCurrency(finalTotalPayment)}
+          </Typography>
+
+          {/* Payment method selection */}
+          <FormControl
+            fullWidth
+            sx={{ gridColumn: "span 4", zIndex: 1 }}
+            variant="outlined"
+          >
+            <InputLabel id="payment-method-label">
+              {t("Phương thức thanh toán")}
+            </InputLabel>
+            <Select
+              labelId="payment-method-label"
+              value={selectedPaymentMethod}
+              onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+              label={t("Phương thức thanh toán")}
+              color="warning"
+              size="small"
+            >
+              <MenuItem value="VNPAY">VNPay</MenuItem>
+              <MenuItem value="MOMO">MoMo</MenuItem>
+              <MenuItem value="BANK">Ngân hàng</MenuItem>
+              <MenuItem value="CREDIT_CARD">Thẻ tín dụng</MenuItem>
+            </Select>
+            {!selectedPaymentMethod && (
+              <FormHelperText error>
+                {t("Vui lòng chọn phương thức thanh toán.")}
               </FormHelperText>
             )}
           </FormControl>
 
-          {/* payment status */}
-          {/* <FormControl
-            sx={{
-              gridColumn: "span 2",
-              display: cardPaymentSelect ? "none" : "initial",
-            }}
+          {/* Nút thanh toán */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handlePayment}
+            sx={{ gridColumn: "span 4" }}
           >
-            <FormLabel color="warning" id="paymentStatus">
-              Payment Status
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="paymentStatus"
-              name="row-radio-buttons-group"
-              value={values.paymentStatus}
-              onChange={(e) => {
-                setFieldValue("paymentStatus", e.target.value);
-              }}
-            >
-              <FormControlLabel
-                value="UNPAID"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label="UNPAID"
-              />
-              <FormControlLabel
-                value="PAID"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label="PAID"
-              />
-            </RadioGroup>
-          </FormControl> */}
-
-          {/* name on card */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Tên chủ thẻ *")}
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("nameOnCard", e.target.value)}
-            value={values.nameOnCard}
-            name="nameOnCard"
-            error={!!touched.nameOnCard && !!errors.nameOnCard}
-            helperText={touched.nameOnCard && errors.nameOnCard}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          />
-
-          {/* card number */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Số thẻ *")}
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("cardNumber", e.target.value)}
-            value={values.cardNumber}
-            name="cardNumber"
-            error={!!touched.cardNumber && !!errors.cardNumber}
-            helperText={touched.cardNumber && errors.cardNumber}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          />
-
-          {/* expired date */}
-          <FormControl
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          >
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                format="MM/yy"
-                label={t("Ngày hết hạn")}
-                views={["year", "month"]}
-                openTo="month"
-                minDate={new Date()}
-                maxDate={new Date(2050, 12, 41)}
-                value={parse(values.expiredDate, "MM/yy", new Date())}
-                onChange={(newDate) => {
-                  setFieldValue("expiredDate", format(newDate, "MM/yy"));
-                }}
-                slotProps={{
-                  textField: {
-                    InputProps: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <CalendarMonthIcon />
-                        </InputAdornment>
-                      ),
-                    },
-                    fullWidth: true,
-                    size: "small",
-                    color: "warning",
-                    error: !!touched.expiredDate && !!errors.expiredDate,
-                  },
-                }}
-              />
-            </LocalizationProvider>
-            {!!touched.expiredDate && !!errors.expiredDate && (
-              <FormHelperText error>{errors.expiredDate}</FormHelperText>
-            )}
-          </FormControl>
-
-          {/* cvv */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("CVV *")}
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("cvv", e.target.value)}
-            value={values.cvv}
-            name="cvv"
-            error={!!touched.cvv && !!errors.cvv}
-            helperText={touched.cvv && errors.cvv}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          />
+            {t("Thanh toán")}
+          </Button>
         </Box>
       </Box>
     </>

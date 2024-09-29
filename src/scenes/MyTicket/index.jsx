@@ -8,13 +8,14 @@ import {
   Modal,
   TextField,
   Typography,
+  useTheme
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { compareAsc, format, isAfter, parse } from "date-fns";
+import { compareAsc, format, isAfter, parse,parseISO } from "date-fns";
 import { debounce } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import * as bookingApi from "../../queries/booking/ticketQueries";
-import { tokens } from "../../theme";
+import { tokens, ColorModeContext } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
 import { useTranslation } from "react-i18next";
@@ -42,7 +43,9 @@ const formatCurrency = (amount) => {
 };
 
 const MyTicket = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
   const [openModal, setOpenModal] = useState(false);
   const [isInValidPhone, setIsInValidPhone] = useState(false);
   const [sortedTickets, setSortedTickets] = useState([]);
@@ -64,18 +67,15 @@ const MyTicket = () => {
   });
 
   const sortTickets = (ticketList) => {
-    if (ticketList?.length === 0) return ticketList;
-
+    if (!ticketList?.length) return [];
+  
     const compareByDepartureDateTimeAsc = (a, b) => {
-      const aDateTime = a.trip.departureDateTime;
-      const bDateTime = b.trip.departureDateTime;
-      return compareAsc(bDateTime, aDateTime);
+      const aDateTime = parseISO(a.trip.departureDateTime); // Chuyển chuỗi thành Date
+      const bDateTime = parseISO(b.trip.departureDateTime);
+      return compareAsc(aDateTime, bDateTime);
     };
-
-    // sort desc
-    ticketList.sort(compareByDepartureDateTimeAsc);
-
-    return ticketList;
+  
+    return [...ticketList].sort(compareByDepartureDateTimeAsc);
   };
 
   const getPaymentStatusObject = (paymentStatus) => {
@@ -114,6 +114,8 @@ const MyTicket = () => {
       flexDirection="column"
       gap="20px"
       alignItems="center"
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.secondary} // Màu chữ từ theme
     >
       <Typography variant="h2" fontWeight="bold">
         {t("Vé của bạn")}
@@ -125,6 +127,7 @@ const MyTicket = () => {
             gridTemplateColumns="repeat(12, 1fr)"
             gap="30px"
             p="50px"
+            bgcolor={colors.primary[100]}
             sx={{
               width: "100%",
               position: "relative",

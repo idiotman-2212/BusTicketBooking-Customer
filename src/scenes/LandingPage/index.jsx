@@ -5,16 +5,24 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import { Box } from "@mui/material";
-import { tokens } from "../../theme";
+import { tokens, ColorModeContext } from "../../theme";
 import Paragraph from "../../global/Paragraph";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@emotion/react";
+import { useContext } from "react";
 
 const LandingPage = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
   const { t } = useTranslation();
 
   return (
-    <Box mt="100px">
+    <Box 
+    mt="100px"
+    bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
+    >
       <Swiper
         spaceBetween={30}
         centeredSlides={true}
@@ -61,7 +69,7 @@ const LandingPage = () => {
         </SwiperSlide>
       </Swiper>
 
-      <Box bgcolor={colors.primary[100]} mt="40px" borderRadius="8px">
+      <Box bgcolor={colors.blueAccent[100]} mt="40px" borderRadius="8px">
         <Paragraph
           title={t("Đặt vé trực tuyến trên DATVEXE")}
           content={t("Hầu hết khách du lịch Việt Nam thích đi du lịch đến điểm đến ưa thích của họ bằng đường bộ. Đó là do thực tế là một chuyến đi đường cho phép bạn thưởng thức vẻ đẹp phong cảnh theo tốc độ của riêng bạn. Hơn nữa, sự thoải mái khi đi trên một chiếc xe cùng gia đình và bạn bè của bạn là không gì sánh được. Bạn có thể chọn đặt xe taxi trực tuyến sẽ giúp hành trình của bạn không gặp rắc rối. Bạn chỉ cần truy cập cổng DATVEXE và chọn một chiếc taxi.")}

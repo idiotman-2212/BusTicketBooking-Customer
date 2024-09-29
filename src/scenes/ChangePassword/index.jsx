@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Formik } from "formik";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import * as authApi from "../../queries/auth/authQueries";
-import { tokens } from "../../theme";
+import { tokens, ColorModeContext } from "../../theme";
 import { debounce } from "../../utils/debounce";
 import { handleToast } from "../../utils/helpers";
 import useLogin from "../../utils/useLogin";
@@ -21,6 +21,7 @@ import {
   IconButton,
   FormHelperText,
   Button,
+  useTheme
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -43,7 +44,9 @@ const changePwdSchema = yup.object().shape({
 });
 
 const ChangePassword = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const {t}  = useTranslation();
@@ -74,6 +77,8 @@ const ChangePassword = () => {
       justifyContent="center"
       alignItems="center"
       height="500px"
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Formik
         onSubmit={handleChangePasswordSubmit}

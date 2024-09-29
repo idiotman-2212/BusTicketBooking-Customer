@@ -81,7 +81,7 @@ const Topbar = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
   const [language, setLanguage] = useState("vi"); // Ngôn ngữ hiện tại
 
@@ -103,7 +103,8 @@ const Topbar = () => {
       justifyContent="space-between"
       alignItems="center"
       p="12px 30px"
-      bgcolor="#b4b0b0"
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Box
         sx={{
@@ -111,7 +112,7 @@ const Topbar = () => {
         }}
       >
         {/* ICON */}
-        <Link to="/" style={{ textDecoration: "none", color: "#000" }}>
+        <Link to="/" style={{ textDecoration: "none", color: theme.palette.text.primary }}>
           <Box
             display="flex"
             justifyContent="center"
@@ -146,7 +147,7 @@ const Topbar = () => {
             variant="contained"
             disableRipple
             disableElevation
-            color="info"
+            color="secondary" // Sử dụng màu từ theme
           >
             <Box display="flex" gap="10px">
               <ConfirmationNumberIcon />
@@ -160,7 +161,7 @@ const Topbar = () => {
             variant="contained"
             disableRipple
             disableElevation
-            color="info"
+            color="secondary" // Sử dụng màu từ theme
           >
             <Box display="flex" gap="10px">
               <SearchIcon />
@@ -176,7 +177,7 @@ const Topbar = () => {
           disableElevation
           disableRipple
           variant="contained"
-          color="secondary"
+          color="secondary" // Sử dụng màu từ theme
           onClick={() => {
             navigate("/my-ticket");
           }}
@@ -186,7 +187,7 @@ const Topbar = () => {
         </Button>
         {/* side bar user settings */}
         <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
-          <Box display="flex" alignItems="center" gap="5px" color="#000">
+        <Box display="flex" alignItems="center" gap="5px" color={theme.palette.text.primary}>
             <ManageAccountsOutlinedIcon />
           </Box>
           <Drawer

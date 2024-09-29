@@ -19,8 +19,8 @@ import ForgotPwd from "./scenes/ForgotPwd";
 import ChangePassword from "./scenes/ChangePassword";
 import MyTicket from "./scenes/MyTicket";
 import "./utils/i18n"; // import file cấu hình i18n
-import { useEffect } from "react";
-import Chat from "./scenes/Chat";
+import LoyaltyPoint from "./scenes/LoyaltyPoint";
+import Contact from "./scenes/Contact";
 
 const ProtectedRoutes = () => {
   const isLoggedIn = useLogin();
@@ -41,25 +41,6 @@ const App = () => {
       },
     },
   });
-
-  //Tích hợp chatbot
-  // useEffect(() => {
-  //   (function(d, m) {
-  //     var kommunicateSettings = {
-  //       "appId": "291034e15da45c3b1f0f79c535bfe8dda", // Thay YOUR_APP_ID bằng App ID của bạn
-  //       "popupWidget": true,
-  //       "automaticChatOpenOnNavigation": true
-  //     };
-  //     var s = document.createElement("script");
-  //     s.type = "text/javascript";
-  //     s.async = true;
-  //     s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
-  //     var h = document.getElementsByTagName("head")[0];
-  //     h.appendChild(s);
-  //     window.kommunicate = m;
-  //     m._globals = kommunicateSettings;
-  //   })(document, window.kommunicate || {});
-  // }, []);
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -85,10 +66,8 @@ const App = () => {
                         path="change-password"
                         element={<ChangePassword />}
                       />
-                      
-                      //Chat với nhân viên
-                      <Route path="chat" element={<Chat staffUsername="actualStaffUsername" />} />
-
+                      {/* Truyền mode vào LoyaltyPoint */}
+                      <Route path="/my_loyalty" element={<LoyaltyPoint mode={theme.palette.mode} />} />
                     </Route>
                     <Route path="booking" element={<BookingOrder />} />
                     <Route path="booking-search" element={<BookingSearch />} />
@@ -97,7 +76,7 @@ const App = () => {
                 </Routes>
               </Container>
             </main>
-            <Chat staffUsername="actualStaffUsername" /> {/* Thêm component chat ở đây */}
+            <Contact /> {/* Thêm nút liên hệ hiển thị trên mọi trang */}
           </div>
           <ReactQueryDevtools initialIsOpen={false} position="bottom-left" />
         </QueryClientProvider>

@@ -10,8 +10,8 @@ import {
   RadioGroup,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
-import { tokens } from "../../theme";
 import * as userApi from "../../queries/user/userQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useLogin from "../../utils/useLogin";
@@ -29,6 +29,8 @@ import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
 import { handleToast } from "../../utils/helpers";
 import { useTranslation } from "react-i18next";
+import { ColorModeContext, tokens } from "../../theme";
+import { useContext } from "react";
 
 const initialValues = {
   username: "",
@@ -102,11 +104,13 @@ const userScheme = yup.object().shape({
 });
 
 const UserSettings = () => {
-  const colors = tokens();
   const isLoggedIn = useLogin();
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
 
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
@@ -133,7 +137,12 @@ const UserSettings = () => {
   };
 
   return (
-    <Box mt="100px" display="flex" justifyContent="center">
+    <Box mt="100px"
+     display="flex"
+    justifyContent="center"
+    bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
+    >
       <Box
         display="flex"
         justifyContent="center"
@@ -171,7 +180,7 @@ const UserSettings = () => {
                 gridTemplateColumns="repeat(4, 1fr)"
                 gap="30px"
                 p="30px 40px"
-                bgcolor={colors.primary[100]}
+                bgcolor={colors.primary[100]} // Màu nền sử dụng từ theme
                 borderRadius="8px"
               >
                 <TextField
@@ -273,7 +282,7 @@ const UserSettings = () => {
                         dialog: {
                           sx: {
                             "& .MuiButton-root": {
-                              color: colors.greyAccent[100],
+                              color: colors.grey[100],
                             },
                           },
                         },

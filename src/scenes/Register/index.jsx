@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import * as yup from "yup";
 import { messages } from "../../utils/validationMessages";
 import * as authApi from "../../queries/auth/authQueries";
@@ -6,7 +6,7 @@ import { debounce } from "../../utils/debounce";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { Formik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
-import { tokens } from "../../theme";
+import { tokens, ColorModeContext } from "../../theme";
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import {
   IconButton,
   FormHelperText,
   Button,
+  useTheme
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -77,7 +78,9 @@ const registerSchema = yup.object().shape({
 });
 
 const Register = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const {t} = useTranslation();
@@ -111,6 +114,8 @@ const Register = () => {
       justifyContent="center"
       alignItems="center"
       height="600px"
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Formik
         onSubmit={handleFormSubmit}
