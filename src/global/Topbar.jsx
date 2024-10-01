@@ -30,6 +30,7 @@ import { initReactI18next, useTranslation } from "react-i18next";
 import vietnamFlag from "../assets/vietnam.png";
 import usaFlag from "../assets/uk.png";
 import i18n from "../utils/i18n";
+import Notification from "../scenes/Notification";
 
 const renderUserSettings = (isLoggedIn) => {
   return (
@@ -185,6 +186,10 @@ const Topbar = () => {
         >
           {t("Vé của tôi")}
         </Button>
+        
+        {/* Notification */}
+        <Notification />
+
         {/* side bar user settings */}
         <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
         <Box display="flex" alignItems="center" gap="5px" color={theme.palette.text.primary}>
