@@ -1,223 +1,325 @@
 import React, { useState, useEffect } from 'react';
-import { getUnreadNotifications, getRecentNotifications, markNotificationAsRead } from '../../queries/notification/notificationQueries';
 import {
-    IconButton,
-    Badge,
-    Menu,
-    MenuItem,
-    ListItemText,
-    Typography,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    Divider,
-    Box,
-    Avatar,
-    Card,
-    CardHeader,
-    CardContent
+  getUnreadNotifications,
+  getRecentNotifications,
+  getAllNotifications,
+  markNotificationAsRead,
+  getUnreadNotificationCount,
+  deleteNotification
+} from '../../queries/notification/notificationQueries';
+import {
+  IconButton,
+  Badge,
+  Menu,
+  MenuItem,
+  ListItemText,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Divider,
+  Box,
+  Card,
+  CardHeader,
+  CardContent,
+  CircularProgress
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useTheme, styled } from '@mui/material/styles';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import icon để xóa thông báo
+import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-
-// Styled components
-const NotificationBox = styled(Card)(({ theme }) => ({
-    width: '100%',
-    marginBottom: theme.spacing(2),
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.spacing(2),  // Rounded corners
-    boxShadow: theme.shadows[3],
-    transition: 'transform 0.3s ease',
-    "&:hover": {
-        transform: 'scale(1.03)',  // Slight zoom on hover
-        backgroundColor: theme.palette.action.hover
-    }
-}));
-
-const ViewAllButton = styled(Button)(({ theme }) => ({
-    display: 'block',
-    margin: '0 auto',
-    color: theme.palette.secondary.main,
-    backgroundColor: theme.palette.background.default,
-    "&:hover": {
-        backgroundColor: theme.palette.primary.light
-    }
-}));
-
-const NotificationDialogTitle = styled(DialogTitle)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.common.white,
-}));
-
-const NotificationDialogActions = styled(DialogActions)(({ theme }) => ({
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(2),
-    display: 'flex',
-    justifyContent: 'center',
-    borderTop: `1px solid ${theme.palette.divider}`,
-}));
 
 const Notification = () => {
-    const [unreadNotifications, setUnreadNotifications] = useState([]); 
-    const [recentNotifications, setRecentNotifications] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [openModal, setOpenModal] = useState(false);
-    const [openAllNotificationsDialog, setOpenAllNotificationsDialog] = useState(false);
-    const [selectedNotification, setSelectedNotification] = useState(null);
-    const theme = useTheme();
-    const { t } = useTranslation();
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [recentNotifications, setRecentNotifications] = useState([]);
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openRecentModal, setOpenRecentModal] = useState(false);
+  const [openAllModal, setOpenAllModal] = useState(false); // Separate modal for all notifications
+  const [loadingUnread, setLoadingUnread] = useState(true);
+  const [loadingRecent, setLoadingRecent] = useState(false);
+  const [loadingAll, setLoadingAll] = useState(false);
+  const theme = useTheme();
+  const { t } = useTranslation();
 
-    // Lấy thông báo chưa đọc từ backend
-    useEffect(() => {
-        const fetchUnreadNotifications = async () => {
-            try {
-                const unreadNotificationsData = await getUnreadNotifications();
-                setUnreadNotifications(unreadNotificationsData); 
-            } catch (error) {
-                console.error("Error fetching unread notifications", error);
-            }
-        };
+  useEffect(() => {
+    fetchUnreadNotifications();
+    fetchUnreadCount();
 
-        fetchUnreadNotifications();
-    }, []);
+    const intervalId = setInterval(() => {
+      fetchUnreadNotifications();
+      fetchUnreadCount();
+    }, 30000);
 
-    // Lấy dữ liệu thông báo gần đây từ backend
-    const handleViewAllClick = async () => {
-        try {
-            const recentNotificationsData = await getRecentNotifications();
-            setRecentNotifications(recentNotificationsData);
-            setOpenAllNotificationsDialog(true);
-        } catch (error) {
-            console.error("Error fetching recent notifications", error);
-        }
-    };
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, []);
 
-    // Đánh dấu thông báo là đã đọc và mở modal chi tiết
-    const handleNotificationClick = async (notification) => {
-        try {
-            await markNotificationAsRead(notification.id);
+  const fetchUnreadNotifications = async () => {
+    try {
+      setLoadingUnread(true);
+      const unreadNotificationsData = await getUnreadNotifications();
+      setUnreadNotifications(unreadNotificationsData);
+    } catch (error) {
+      console.error("Error fetching unread notifications", error);
+    } finally {
+      setLoadingUnread(false);
+    }
+  };
 
-            setUnreadNotifications(prevUnread => prevUnread.filter(n => n.id !== notification.id));
+  const fetchUnreadCount = async () => {
+    try {
+      const count = await getUnreadNotificationCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching unread notification count", error);
+    }
+  };
 
-            setSelectedNotification(notification);
-            setOpenModal(true);
-        } catch (error) {
-            console.error("Error marking notification as read", error);
-        }
-    };
+  const handleViewRecentClick = async () => {
+    try {
+      setLoadingRecent(true);
+      const recentNotificationsData = await getRecentNotifications();
+      setRecentNotifications(recentNotificationsData);
+      setOpenRecentModal(true); // Open recent notifications modal
+    } catch (error) {
+      console.error("Error fetching recent notifications", error);
+    } finally {
+      setLoadingRecent(false);
+    }
+  };
 
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        setSelectedNotification(null);
-    };
+  const handleViewAllClick = async () => {
+    try {
+      setLoadingAll(true);
+      const allNotificationsData = await getAllNotifications();
+      setAllNotifications(allNotificationsData);
+      setOpenAllModal(true); // Open all notifications modal
+    } catch (error) {
+      console.error("Error fetching all notifications", error);
+    } finally {
+      setLoadingAll(false);
+    }
+  };
 
-    const handleCloseAllNotificationsDialog = () => {
-        setOpenAllNotificationsDialog(false);
-    };
+  const handleNotificationClick = async (notification) => {
+    try {
+      await markNotificationAsRead(notification.id);
+      setUnreadNotifications((prev) => prev.filter(n => n.id !== notification.id));
+      setUnreadCount((prevCount) => prevCount - 1);
+    } catch (error) {
+      console.error("Error marking notification as read", error);
+    }
+  };
 
-    // Mở menu thông báo
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+  // Xử lý xóa thông báo
+  const handleDeleteNotification = async (notificationId) => {
+    try {
+      await deleteNotification(notificationId);
+      // Sau khi xóa, cập nhật lại danh sách recent và all để loại bỏ thông báo đã xóa
+      setRecentNotifications((prev) => prev.filter(n => n.id !== notificationId));
+      setAllNotifications((prev) => prev.filter(n => n.id !== notificationId));
+    } catch (error) {
+      console.error("Error deleting notification", error);
+    }
+  };
 
-    // Đóng menu thông báo
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+  const handleCloseRecentModal = () => {
+    setOpenRecentModal(false);
+    setRecentNotifications([]);
+  };
 
-    return (
+  const handleCloseAllModal = () => {
+    setOpenAllModal(false);
+    setAllNotifications([]);
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <Box>
+      <IconButton color="inherit" onClick={handleMenuOpen}>
+        <Badge badgeContent={unreadCount} color="error">
+          <NotificationsIcon />
+        </Badge>
+      </IconButton>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          style: {
+            maxHeight: 48 * 4.5,
+            width: '350px',
+          },
+        }}
+      >
+        {loadingUnread ? (
+          <CircularProgress />
+        ) : (
+          unreadNotifications.length > 0 ? (
+            unreadNotifications.map((notification) => (
+              <MenuItem key={notification.id} onClick={() => handleNotificationClick(notification)}>
+                <ListItemText 
+                  primary={<Typography variant="body1" style={{ fontWeight: 500 }}>{notification.title || t("No title")}</Typography>} 
+                  secondary={<Typography variant="caption" color="textSecondary">{new Date(notification.sendDateTime).toLocaleString()}</Typography>} 
+                />
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem disabled>
+              <Typography fontSize="13px" fontWeight="bold" variant="body2">{t("No new notifications")}</Typography>
+            </MenuItem>
+          )
+        )}
+
+        <Divider />
         <Box>
-            {/* Biểu tượng thông báo với Badge */}
-            <IconButton color="inherit" onClick={handleMenuOpen}>
-                <Badge badgeContent={unreadNotifications.length} color="error">
-                    <NotificationsIcon />
-                </Badge>
-            </IconButton>
+          <MenuItem onClick={handleViewRecentClick} >
+            <Button variant='outlined' color='secondary'>View recent notifications</Button>
+          </MenuItem>
+          <MenuItem onClick={handleViewAllClick}>
+            <Button variant='outlined' color='secondary'>View all notifications</Button>
+          </MenuItem>
+        </Box>  
+      </Menu>
 
-            {/* Menu thông báo */}
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                    style: {
-                        maxHeight: 48 * 4.5,
-                        width: '350px',
-                    },
+      {/* Dialog for recent notifications */}
+      <Dialog open={openRecentModal} onClose={handleCloseRecentModal} fullWidth maxWidth="md">
+        <DialogTitle
+          style={{
+            backgroundColor: theme.palette.primary.dark,
+            color: theme.palette.common.white,
+          }}
+        >
+          {t("Recent Notifications")}
+        </DialogTitle>
+        <DialogContent>
+          {loadingRecent ? (
+            <CircularProgress />
+          ) : recentNotifications.length > 0 ? (
+            recentNotifications.map((notification) => (
+              <Card
+                key={notification.id}
+                style={{
+                  width: '100%',
+                  marginBottom: theme.spacing(2),
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: theme.spacing(2),
+                  boxShadow: theme.shadows[3],
+                  transition: 'transform 0.3s ease',
+                  transform: 'scale(1)',
+                  "&:hover": {
+                    transform: 'scale(1.03)',
+                    backgroundColor: theme.palette.action.hover
+                  }
                 }}
-            >
-                {/* Hiển thị thông báo chưa đọc */}
-                {unreadNotifications.length > 0 ? (
-                    unreadNotifications.map((notification) => (
-                        <MenuItem key={notification.id} onClick={() => handleNotificationClick(notification)}>
-                            <ListItemText 
-                                primary={<Typography variant="body1" style={{ fontWeight: 500 }}>{notification.title || t("No title")}</Typography>} 
-                                secondary={<Typography variant="caption" color="textSecondary">{new Date(notification.createdAt).toLocaleString()}</Typography>} 
-                            />
-                        </MenuItem>
-                    ))
-                ) : (
-                    <MenuItem disabled>
-                        <Typography fontSize="13px" fontWeight="bold" variant="body2">{t("No new notifications")}</Typography>
-                    </MenuItem>
-                )}
+              >
+                <CardHeader
+                  title={<Typography variant="subtitle1" fontSize="13px" style={{ fontWeight: 'bold' }}>{notification.title || t("No title")}</Typography>}
+                  subheader={<Typography fontSize="13px" variant="caption">{new Date(notification.sendDateTime).toLocaleString()}</Typography>}
+                />
+                <CardContent>
+                  <Typography variant="body2" fontSize="13px" style={{ color: theme.palette.text.primary }}>
+                    {notification.message}
+                  </Typography>
+                  {/* Thêm nút xóa thông báo */}
+                  <IconButton onClick={() => handleDeleteNotification(notification.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography>{t("No notifications found.")}</Typography>
+          )}
+        </DialogContent>
+        <DialogActions
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(2),
+            display: 'flex',
+            justifyContent: 'center',
+            borderTop: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Button onClick={handleCloseRecentModal} style={{ fontWeight:'bold' }} variant='contained' color="secondary">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
 
-                <Divider />
-                {/* Xem tất cả thông báo */}
-                <MenuItem onClick={handleViewAllClick}>
-                    <ViewAllButton>{t("View all notifications")}</ViewAllButton>
-                </MenuItem>
-            </Menu>
-
-            {/* Modal chi tiết thông báo */}
-            <Dialog open={openModal} onClose={handleCloseModal}>
-                <NotificationDialogTitle>{t("Notification Details")}</NotificationDialogTitle>
-                <DialogContent>
-                    {selectedNotification && (
-                        <>
-                            <Typography variant="h6" gutterBottom>{t("Title")}: {selectedNotification.title}</Typography>
-                            <Typography variant="body1" gutterBottom>{t("Content")}: {selectedNotification.message}</Typography>
-                        </>
-                    )}
-                </DialogContent>
-                <NotificationDialogActions>
-                    <Button onClick={handleCloseModal} color="primary">{t("Close")}</Button>
-                </NotificationDialogActions>
-            </Dialog>
-
-            {/* Hộp thoại Xem tất cả thông báo */}
-            <Dialog open={openAllNotificationsDialog} onClose={handleCloseAllNotificationsDialog} fullWidth maxWidth="md">
-                <NotificationDialogTitle >{t("All Notifications")}</NotificationDialogTitle>
-                <DialogContent>
-                    {recentNotifications.length > 0 ? (
-                        recentNotifications.map((notification) => (
-                            <NotificationBox key={notification.id}>
-                                <CardHeader
-                                    avatar={<Avatar><AccountCircleIcon /></Avatar>}
-                                    title={<Typography variant="subtitle1" fontSize="13px" style={{ fontWeight: 'bold' }}>{notification.title || t("No title")}</Typography>}
-                                    subheader={<Typography fontSize="13px" variant="caption">{new Date(notification.createdAt).toLocaleString()}</Typography>}
-                                />
-                                <CardContent>
-                                    <Typography variant="body2" fontSize="13px" style={{ color: theme.palette.text.primary }}>
-                                        {notification.message}
-                                    </Typography>
-                                </CardContent>
-                            </NotificationBox>
-                        ))
-                    ) : (
-                        <Typography variant="body2">{t("No notifications available")}</Typography>
-                    )}
-                </DialogContent>
-                <NotificationDialogActions>
-                    <Button onClick={handleCloseAllNotificationsDialog} style={{ fontWeight:'bold' }} variant='contained' color="secondary">{t("Close")}</Button>
-                </NotificationDialogActions>
-            </Dialog>
-        </Box>
-    );
+      {/* Dialog for all notifications */}
+      <Dialog open={openAllModal} onClose={handleCloseAllModal} fullWidth maxWidth="md">
+        <DialogTitle
+          style={{
+            backgroundColor: theme.palette.primary.dark,
+            color: theme.palette.common.white,
+          }}
+        >
+          {t("All Notifications")}
+        </DialogTitle>
+        <DialogContent>
+          {loadingAll ? (
+            <CircularProgress />
+          ) : allNotifications.length > 0 ? (
+            allNotifications.map((notification) => (
+              <Card
+                key={notification.id}
+                style={{
+                  width: '100%',
+                  marginBottom: theme.spacing(2),
+                  backgroundColor: theme.palette.background.paper,
+                  borderRadius: theme.spacing(2),
+                  boxShadow: theme.shadows[3],
+                  transition: 'transform 0.3s ease',
+                  transform: 'scale(1)',
+                  "&:hover": {
+                    transform: 'scale(1.03)',
+                    backgroundColor: theme.palette.action.hover
+                  }
+                }}
+              >
+                <CardHeader
+                  title={<Typography variant="subtitle1" fontSize="13px" style={{ fontWeight: 'bold' }}>{notification.title || t("No title")}</Typography>}
+                  subheader={<Typography fontSize="13px" variant="caption">{new Date(notification.sendDateTime).toLocaleString()}</Typography>}
+                />
+                <CardContent>
+                  <Typography variant="body2" fontSize="13px" style={{ color: theme.palette.text.primary }}>
+                    {notification.message}
+                  </Typography>
+                  {/* Thêm nút xóa thông báo */}
+                  <IconButton onClick={() => handleDeleteNotification(notification.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography>{t("No notifications found.")}</Typography>
+          )}
+        </DialogContent>
+        <DialogActions
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(2),
+            display: 'flex',
+            justifyContent: 'center',
+            borderTop: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Button onClick={handleCloseAllModal} style={{ fontWeight:'bold' }} variant='contained' color="secondary">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 };
 
 export default Notification;

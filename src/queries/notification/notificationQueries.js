@@ -1,16 +1,11 @@
 import { http } from '../../utils/http';
 
-// Lấy tất cả thông báo của người dùng đã đăng nhập
-export const getNotifications = async () => {
-    try {
-        const response = await http.get('/notifications'); // Đúng với cấu trúc @RequestMapping("/api/v1/notifications")
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching notifications:", error);
-        throw error;
-    }
-};
-
+// Lấy danh sách thông báo của người dùng
+export const getAllNotifications  = async () => {
+    const response = await http.get('/notifications/user');
+    return response.data;
+  };
+  
 // Lấy các thông báo trong 7 ngày qua
 export const getRecentNotifications = async () => {
     try {
@@ -33,10 +28,21 @@ export const getUnreadNotifications = async () => {
     }
 };
 
+// Lấy số lượng thông báo chưa đọc
+export const getUnreadNotificationCount = async () => {
+    try {
+        const response = await http.get('/notifications/unread-count');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching unread notification count:", error);
+        throw error;
+    }
+};
+
 // Đánh dấu thông báo là đã đọc
 export const markNotificationAsRead = async (notificationId) => {
     try {
-        await http.post(`/notifications/${notificationId}/mark-as-read`);
+        await http.post(`/notifications/${notificationId}/read`);
     } catch (error) {
         console.error("Error marking notification as read:", error);
         throw error;
