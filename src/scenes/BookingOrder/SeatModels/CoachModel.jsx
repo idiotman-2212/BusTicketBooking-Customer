@@ -1,12 +1,13 @@
 import SquareIcon from "@mui/icons-material/Square";
 import { Box, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState , useEffect} from "react";
 import Bed_Limousine_Seat_Data from "../SeatModels/Bed_Limousine_Seat_Data";
 import SeatModel from "../SeatModels/SeatModel";
 import * as bookingApi from "../../../queries/booking/ticketQueries";
 import { tokens } from "../../../theme";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const MAX_SEAT_SELECT = 5;
 
@@ -32,6 +33,26 @@ const CoachModel = (props) => {
   const coachType = bookingData.trip.coach.coachType;
   const price = getBookingPrice(bookingData.trip);
   const {t} = useTranslation();
+  const navigate = useNavigate(); 
+
+ // Thêm bộ đếm giờ
+ const [timeLeft, setTimeLeft] = useState(600); 
+
+ useEffect(() => {
+   const timerId = setInterval(() => {
+     setTimeLeft((prev) => prev - 1);
+   }, 1000);
+
+   if (timeLeft === 0) {
+     clearInterval(timerId);
+     releaseSeats({ seatNumber: selectedSeats, trip: bookingData.trip });
+     alert('Thời gian giữ ghế đã hết. Quay lại chọn chuyến đi.');
+     navigate('/choose-trip');
+   }
+
+   return () => clearInterval(timerId);
+  }, [timeLeft, selectedSeats, bookingData.trip, navigate]);
+
 
   // lấy thông tin ghế đã đặt
   const seatBookingQuery = useQuery({
@@ -117,6 +138,7 @@ const CoachModel = (props) => {
       bgcolor={colors.primary[100]}
       borderRadius="10px"
     >
+    
       {/* render seat tip */}
       <Box
         gridColumn="span 3"
@@ -201,6 +223,17 @@ const CoachModel = (props) => {
         alignItems="center"
         flexDirection="column"
       >
+      {/* Render bộ đếm giờ */}
+      <Box
+        gridColumn="span 12"
+        textAlign="center"
+        mb="20px"
+      >
+        <Typography variant="h6" color="error">
+          {`Thời gian giữ ghế còn lại: ${Math.floor(timeLeft / 60)}:${timeLeft % 60} phút`}
+        </Typography>
+      </Box>
+      <Box>
         <Typography variant="h5">
           <span style={{ fontWeight: "bold" }}>
             {t("Đã chọn")}: {numberOfSelectedSeats} / {MAX_SEAT_SELECT} {t("chỗ")}
@@ -211,6 +244,7 @@ const CoachModel = (props) => {
             {t("Tổng tiền")}: {formatCurrency(price * numberOfSelectedSeats)}
           </span>
         </Typography>
+        </Box>
       </Box>
     </Box>
   );

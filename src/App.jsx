@@ -21,6 +21,7 @@ import MyTicket from "./scenes/MyTicket";
 import "./utils/i18n"; // import file cấu hình i18n
 import LoyaltyPoint from "./scenes/LoyaltyPoint";
 import Contact from "./scenes/Contact";
+import Review from "./scenes/Review";
 
 const ProtectedRoutes = () => {
   const isLoggedIn = useLogin();
@@ -67,7 +68,7 @@ const App = () => {
                         element={<ChangePassword />}
                       />
                       {/* Truyền mode vào LoyaltyPoint */}
-                      <Route path="/my_loyalty" element={<LoyaltyPoint mode={theme.palette.mode} />} />
+                      <Route path="/my_loyalty" element={<LoyaltyPoint/>} />
                     </Route>
                     <Route path="booking" element={<BookingOrder />} />
                     <Route path="booking-search" element={<BookingSearch />} />
