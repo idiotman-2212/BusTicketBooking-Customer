@@ -55,16 +55,8 @@ const getAvailableBooking = async () => {
 }
 
 const createNewBookings = async (newBookings) => {
-    // Kiểm tra trạng thái ghế trước khi đặt vé
-    for (let seat of newBookings.seatNumber) {
-        const isAvailable = await checkSeatAvailability(seat, newBookings.trip.id);
-        if (!isAvailable) {
-            throw new Error(`Seat ${seat} is no longer available`);
-        }
-    }
-    // Nếu tất cả ghế khả dụng, tiếp tục đặt vé
-    const resp = await http.post("/bookings/site1", newBookings);
-    return resp.data;
+    const resp = await http.post("/bookings/site1", newBookings)
+    return resp.data
 }
 
 
@@ -78,28 +70,8 @@ const deleteBooking = async (bookingId) => {
     return resp.data
 }
 
-const holdSeats = async (bookingRequest) => {
-    const resp = await http.post("/bookings/holdSeats", bookingRequest);
-    return resp.data;
-}
-
-const checkSeatAvailability = async (seatNumber, tripId) => {
-    const resp = await http.get("/bookings/checkSeat", {
-        params: {
-            seatNumber: seatNumber,
-            tripId: tripId
-        }
-    });
-    return resp.data;
-}
-
-const releaseSeats = async (bookingRequest) => {
-    const resp = await http.post("/bookings/releaseSeats", bookingRequest);
-    return resp.data;
-}
-
 export {
     createNewBookings, deleteBooking, getAll, getAllByPhone, getAllByUsername,
-    getPageOfBookings, getSeatBooking, getBooking, updateBooking,holdSeats, checkSeatAvailability, releaseSeats, getAvailableBooking
+    getPageOfBookings, getSeatBooking, getBooking, updateBooking, getAvailableBooking
 };
 

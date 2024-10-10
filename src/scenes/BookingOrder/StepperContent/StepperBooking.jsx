@@ -42,6 +42,7 @@ const initialValues = {
   expiredDate: format(new Date(), "MM/yy"), // used to validate when paymentMethod is CARD, remove when submit
   cvv: "", // used to validate when paymentMethod is CARD, remove when submit
   isEditMode: false, // remove this field when submit
+  pointsUsed: 0, // Thêm trường pointsUsed
 };
 
 const renderStepContent = (
@@ -118,6 +119,12 @@ const StepperBooking = () => {
       isEditMode,
       ...newValues
     } = values;
+
+      // Cập nhật totalPayment và pointsUsed từ bookingData
+      newValues.totalPayment = bookingData.totalPayment; // Sử dụng giá trị đã cập nhật
+      newValues.pointsUsed = bookingData.pointsUsed; // Sử dụng giá trị đã cập nhật
+
+      console.log("Dữ liệu gửi đi đến backend:", newValues);
 
     actions.setSubmitting(false);
 
