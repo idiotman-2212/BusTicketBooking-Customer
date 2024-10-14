@@ -1,32 +1,36 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
-  InputAdornment,
-  Radio,
-  RadioGroup,
-  useTheme,
   TextField,
   Typography,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
+  Card,
+  CardContent,
+  Grid,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  InputAdornment,
+  Divider,
+  Paper,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
-import React, { useEffect, useState, useRef } from "react";
-import { tokens } from "../../../../theme";
-import useLogin from "../../../../utils/useLogin";
+import { useTheme } from "@mui/material/styles";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
+import EventSeatIcon from "@mui/icons-material/EventSeat";
+import PaymentIcon from "@mui/icons-material/Payment";
+import LoyaltyIcon from "@mui/icons-material/Loyalty";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import * as userApi from "../../../../queries/user/userQueries";
-import * as loyaltyApi from "../../../../queries/loyalty/loyaltyQueries"; // Add loyalty API
-import { useTranslation } from "react-i18next";
+import * as loyaltyApi from "../../../../queries/loyalty/loyaltyQueries";
+import * as cargoApi from "../../../../queries/cargo/cargoQueries";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -35,7 +39,6 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// lấy giá cuối cùng sau khi áp mã
 const getBookingPrice = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -45,47 +48,34 @@ const getBookingPrice = (trip) => {
 };
 
 const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
-  const colors = tokens();
-  const theme = useTheme(); // use theme for controlling z-index and other styles
-  const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
-  const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
-    field;
+  const theme = useTheme();
   const { t } = useTranslation();
+  const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur } = field;
   const [errorMessage, setErrorMessage] = useState("");
-
-  // Hàm format cho điểm xu (chuyển đổi sang đơn vị tiền tệ)
-  const formatPointsToCurrency = (points) => {
-    return formatCurrency(points);
-  };
-
-  // kiểm tra đã thanh toán thẻ chưa
-  const [cardPaymentSelect, setCardPaymentSelect] = useState(
-    bookingData.paymentMethod === "CARD" ? true : false
-  );
-
-  // Loyalty points (xu) state
+  const [cardPaymentSelect, setCardPaymentSelect] = useState(bookingData.paymentMethod === "CARD");
   const [availablePoints, setAvailablePoints] = useState(0);
-  const [pointsToUse, setPointsToUse] = useState(""); // Ensure pointsToUse defaults to 0
+  const [pointsToUse, setPointsToUse] = useState("");
   const [finalTotalPayment, setFinalTotalPayment] = useState(totalPayment);
-  const [pointsApplied, setPointsApplied] = useState(false); // Trạng thái cho biết liệu điểm xu đã được áp dụng hay chưa
-  const originalTotalPayment = useRef(totalPayment); // Lưu trữ tổng tiền ban đầu không thay đổi
+  const [pointsApplied, setPointsApplied] = useState(false);
+  const [originalTotalPayment, setOriginalTotalPayment] = useState(totalPayment);
+  const [selectedServices, setSelectedServices] = useState({});
 
-  // nếu người dùng đã đăng nhập thì lấy thông tin của người dùng
-  const isLoggedIn = useLogin();
+  const isLoggedIn = true; // Replace with your actual login check
   const loggedInUsername = localStorage.getItem("loggedInUsername");
 
-  // lấy thông tin user
+  const { data: cargos, isLoading } = useQuery(["cargos"], cargoApi.getAllCargos);
+
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
     queryFn: () => userApi.getUser(loggedInUsername),
-    enabled: isLoggedIn && loggedInUsername !== null,
+    enabled: !!loggedInUsername, // kiểm tra kỹ
   });
 
-  // lấy điểm tích xu
   const loyaltyPointsQuery = useQuery({
     queryKey: ["loyaltyPoints"],
     queryFn: () => loyaltyApi.getLoyaltyPoints(),
-    enabled: isLoggedIn && loggedInUsername !== null,
+    enabled: !!loggedInUsername,  // kiểm tra kỹ
   });
 
   useEffect(() => {
@@ -106,352 +96,355 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
   }, [userInfoQuery.data, loggedInUsername]);
 
+  const calculateTotalPayment = () => {
+    let total = originalTotalPayment; // Lấy tổng tiền gốc ban đầu (giá vé)
+    console.log("Giá vé ban đầu: ", total);
+
+    // Tính tổng chi phí cho các dịch vụ bổ sung (cargos)
+    Object.entries(selectedServices).forEach(([cargoId, quantity]) => {
+      if (quantity > 0) { // Chỉ tính khi số lượng > 0
+        const cargo = cargos.find(c => c.id === parseInt(cargoId));
+        if (cargo) {
+          total += cargo.basePrice * quantity;
+        }
+      }
+    });
+    console.log("Tổng tiền sau khi thêm dịch vụ: ", total);
+    return total;
+  };
+
+  const handleServiceChange = (id, quantity) => {
+    if (quantity >= 0) { // Chỉ thay đổi nếu số lượng >= 0
+      setSelectedServices(prev => {
+        const newServices = { ...prev, [id]: quantity };
+
+        // Tính toán lại tổng tiền khi có thay đổi dịch vụ
+        const newTotal = calculateTotalPayment();
+        console.log("Giá tiền sau khi thêm dịch vụ: ", newTotal);
+
+        // Cập nhật tổng tiền và các dịch vụ đã chọn trong bookingData
+        setFinalTotalPayment(newTotal);
+        setBookingData(prevData => ({
+          ...prevData,
+          totalPayment: newTotal,
+          cargoRequests: Object.entries(newServices).map(([cargoId, quantity]) => ({
+            cargoId: parseInt(cargoId),
+            quantity
+          }))
+        }));
+
+        return newServices;
+      });
+    }
+  };
+
+  useEffect(() => {
+    const newTotal = calculateTotalPayment();
+    setFinalTotalPayment(newTotal);
+    setBookingData(prevData => ({
+      ...prevData,
+      totalPayment: newTotal,
+      cargoRequests: Object.entries(selectedServices).map(([cargoId, quantity]) => ({
+        cargoId: parseInt(cargoId),
+        quantity
+      }))
+    }));
+  }, [selectedServices]);
+
   const applyLoyaltyPoints = () => {
     let pointsToApply = parseFloat(pointsToUse);
 
-    // Kiểm tra điểm xu hợp lệ
     if (isNaN(pointsToApply) || pointsToApply <= 0 || pointsToUse === "") {
-        resetToInitialState();
-        return;
+      resetToInitialState();
+      return;
     }
 
     if (pointsToApply > availablePoints) {
-        setErrorMessage(t("Số điểm không hợp lệ hoặc vượt quá số điểm có thể sử dụng."));
-        return;
+      setErrorMessage(t("Số điểm không hợp lệ hoặc vượt quá số điểm có thể sử dụng."));
+      return;
     }
 
-    if (pointsToApply > originalTotalPayment.current) {
-        setErrorMessage(t("Số điểm vượt quá tổng tiền cần thanh toán."));
-        return;
+    if (pointsToApply > finalTotalPayment) {
+      setErrorMessage(t("Số điểm vượt quá tổng tiền cần thanh toán."));
+      return;
     }
 
     setErrorMessage("");
-    const newTotal = Math.max(originalTotalPayment.current - pointsToApply, 0);
+    const newTotal = Math.max(finalTotalPayment - pointsToApply, 0);
+    console.log("Tổng tiền sau khi áp dụng điểm xu: ", newTotal);
 
-    // Log các giá trị để kiểm tra
-    console.log("Tổng tiền mới:", newTotal);
-    console.log("Điểm xu đã sử dụng:", pointsToApply);
-
-    // Cập nhật bookingData
-    setBookingData({
-        ...bookingData,
-        totalPayment: newTotal, // Cập nhật tổng tiền sau khi sử dụng điểm
-        pointsUsed: pointsToApply, // Lưu điểm xu đã sử dụng
-    });
+    setBookingData(prevData => ({
+      ...prevData,
+      totalPayment: newTotal,
+      pointsUsed: pointsToApply,
+    }));
 
     setFinalTotalPayment(newTotal);
     setPointsApplied(true);
-};
+  };
 
-// Đảm bảo khôi phục tổng tiền về giá trị ban đầu
-const resetToInitialState = () => {
+  const resetToInitialState = () => {
     setErrorMessage("");
-    setFinalTotalPayment(originalTotalPayment.current); // Khôi phục tổng tiền ban đầu
+    const newTotal = calculateTotalPayment();
+    setFinalTotalPayment(newTotal);
     setPointsApplied(false);
     setPointsToUse("");
 
-    console.log("Khôi phục về trạng thái ban đầu:", originalTotalPayment.current);
+    setBookingData(prevData => ({
+      ...prevData,
+      totalPayment: newTotal,
+      pointsUsed: 0,
+    }));
+  };
 
-    // Cập nhật lại bookingData
-    setBookingData({
-        ...bookingData,
-        totalPayment: originalTotalPayment.current,
-        pointsUsed: 0, // Reset điểm xu đã sử dụng
-    });
-};
-
-// Xử lý khi người dùng thay đổi số điểm xu
-const handlePointsChange = (e) => {
+  const handlePointsChange = (e) => {
     const value = e.target.value;
     if (value === "" || (!isNaN(value) && parseFloat(value) >= 0)) {
-        setPointsToUse(value);
-        if (value === "") {
-            resetToInitialState();
-        }
+      setPointsToUse(value);
+      if (value === "") {
+        resetToInitialState();
+      }
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     if (pointsToUse === "") {
-        resetToInitialState(); // Khôi phục nếu không có điểm xu
+      resetToInitialState();
     }
-}, [pointsToUse]);
+  }, [pointsToUse]);
 
+  console.log("Tổng tiền cuối cùng sau khi tính tất cả: ", finalTotalPayment);
 
   return (
-    <>
-      <Box
-        mt="40px"
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        justifyContent="center"
-        gap="10px"
-        bgcolor={colors.primary[100]}
-        p="30px"
-        borderRadius="10px"
-      >
-        {/* booking summary */}
-        <Box
-          gridColumn="span 5"
-          display="flex"
-          flexDirection="column"
-          gap="10px"
-        >
-          <Typography variant="h4" fontWeight="bold" mb="16px">
-            {t("Thông tin vé đặt")}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
-            {`${trip.source.name} ${
-              bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
-            } ${trip.destination.name}`}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
-            {trip.coach.name}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Loại")}: </span>
-            {trip.coach.coachType}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Ngày giờ đi")}: </span>{" "}
-            {format(
-              parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
-              "HH:mm dd-MM-yyyy"
-            )}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Tổng tiền")}: </span>
-            {`${formatCurrency(originalTotalPayment.current)} (${
-              seatNumber.length
-            } x ${formatCurrency(getBookingPrice(trip))})`}
-          </Typography>
-          <Typography component="span" variant="h6">
-            <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
-            {seatNumber.join(", ")}
-          </Typography>
-        </Box>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={5}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              {t("Thông tin vé đặt")}
+            </Typography>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="body1" gutterBottom>
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Tuyến")}:</strong> {`${trip?.source?.name ?? ''} ${
+                    bookingData.bookingType === "ONEWAY" ? `→` : `↔`
+                  } ${trip?.destination?.name ?? ''}`}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Xe")}:</strong> {trip?.coach?.name ?? ''}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Loại")}:</strong> {trip?.coach?.coachType ?? ''}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <CalendarMonthIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Ngày giờ đi")}:</strong>{" "}
+                  {trip?.departureDateTime
+                    ? format(parse(trip?.departureDateTime, "yyyy-MM-dd HH:mm", new Date()), "HH:mm dd-MM-yyyy")
+                    : ''}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <PaymentIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Tổng tiền")}:</strong>{" "}
+                  {`${formatCurrency(originalTotalPayment)} (${seatNumber.length} x ${formatCurrency(getBookingPrice(trip))})`}
+                </Typography>
+                <Typography variant="body1">
+                  <EventSeatIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <strong>{t("Ghế")}:</strong> {seatNumber.join(", ")}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
 
-        {/* payment info */}
-        <Box
-          gridColumn="span 7"
-          display="grid"
-          gap="30px"
-          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-        >
-          {/* first name */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Họ *")}
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("firstName", e.target.value)}
-            value={values.firstName}
-            name="firstName"
-            error={!!touched.firstName && !!errors.firstName}
-            helperText={touched.firstName && errors.firstName}
-            sx={{
-              gridColumn: "span 2",
-            }}
-          />
+          <Grid item xs={12} md={7}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              {t("Thông tin khách hàng")}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Họ")}
+                  variant="outlined"
+                  name="firstName"
+                  value={values.firstName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.firstName && Boolean(errors.firstName)}
+                  helperText={touched.firstName && errors.firstName}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Tên")}
+                  variant="outlined"
+                  name="lastName"
+                  value={values.lastName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.lastName && Boolean(errors.lastName)}
+                  helperText={touched.lastName && errors.lastName}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Điện thoại")}
+                  variant="outlined"
+                  name="phone"
+                  value={values.phone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.phone && Boolean(errors.phone)}
+                  helperText={touched.phone && errors.phone}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label={t("Địa chỉ email")}
+                  variant="outlined"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.email && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={t("Địa chỉ đón")}
+                  variant="outlined"
+                  name="pickUpAddress"
+                  value={values.pickUpAddress}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.pickUpAddress && Boolean(errors.pickUpAddress)}
+                  helperText={touched.pickUpAddress && errors.pickUpAddress}
+                />
+              </Grid>
+            </Grid>
 
-          {/* last name */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Tên *")}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={values.lastName}
-            name="lastName"
-            error={!!touched.lastName && !!errors.lastName}
-            helperText={touched.lastName && errors.lastName}
-            sx={{
-              gridColumn: "span 2",
-            }}
-          />
+            <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
+              {t("Choose Additional Services")}
+            </Typography>
+            <Box sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
+              {cargos?.map((cargo) => (
+                <Card key={cargo.id} variant="outlined" sx={{ mb: 1, p: 1 }}>
+                  <Grid container alignItems="center" spacing={2}>
+                    <Grid item xs={8}>
+                      <Typography>{cargo.name} - {formatCurrency(cargo.basePrice)}</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={selectedServices[cargo.id] ?? 0}
+                        onChange={(e) => handleServiceChange(cargo.id, Number(e.target.value))}
+                        inputProps={{ min: 0 }}
+                        fullWidth
+                      />
+                    </Grid>
+                  </Grid>
+                </Card>
+              ))}
+            </Box>
+          </Grid>
+        </Grid>
 
-          {/* phone */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Điện thoại *")}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={values.phone}
-            name="phone"
-            error={!!touched.phone && !!errors.phone}
-            helperText={touched.phone && errors.phone}
-            sx={{
-              gridColumn: "span 2",
-            }}
-          />
+        <Divider sx={{ my: 4 }} />
 
-          {/* email */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Địa chỉ email *")}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={values.email}
-            name="email"
-            error={!!touched.email && !!errors.email}
-            helperText={touched.email && errors.email}
-            sx={{
-              gridColumn: "span 2",
-            }}
-          />
-
-          {/* pickup address */}
-          <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label={t("Địa chỉ đón *")}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={values.pickUpAddress}
-            name="pickUpAddress"
-            error={!!touched.pickUpAddress && !!errors.pickUpAddress}
-            helperText={touched.pickUpAddress && errors.pickUpAddress}
-            sx={{
-              gridColumn: "span 4",
-            }}
-          />
-
-          {/* Điểm Xu */}
-          <Box
-            sx={{
-              gridColumn: "span 4",
-              mt: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Typography variant="h6">
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <Typography variant="body1">
+              <LoyaltyIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
               {t("Số điểm xu của bạn")}: {formatCurrency(availablePoints)}
             </Typography>
-            <TextField
-              type="text"
-              label={t("Số điểm xu muốn sử dụng")}
-              value={pointsToUse}
-              onChange={handlePointsChange}
-              disabled={pointsApplied}
-            />
-            <FormHelperText error>{errorMessage}</FormHelperText>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={applyLoyaltyPoints}
-              disabled={pointsApplied}
-            >
-              {pointsApplied ? t("Đã áp dụng") : t("Áp dụng điểm xu")}
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={resetToInitialState}
-              disabled={!pointsApplied}
-            >
-              {t("Hủy áp dụng điểm xu")}
-            </Button>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={2}>
+              <Grid item xs={8}>
+                <TextField
+                  fullWidth
+                  label={t("Số điểm xu muốn sử dụng")}
+                  variant="outlined"
+                  value={pointsToUse}
+                  onChange={handlePointsChange}
+                  disabled={pointsApplied}
+                  error={Boolean(errorMessage)}
+                  helperText={errorMessage}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={applyLoyaltyPoints}
+                  disabled={pointsApplied}
+                  fullWidth
+                >
+                  {pointsApplied ? t("Đã áp dụng") : t("Áp dụng")}
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          {pointsApplied && (
+            <Grid item xs={4}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={resetToInitialState}
+                fullWidth
+              >
+                {t("Hủy áp dụng điểm xu")}
+              </Button>
+            </Grid>
+          )}
+        </Grid>
 
-            <Typography variant="h6">
-              {t("Tổng tiền sau khi giảm")}:{" "}
-              {formatPointsToCurrency(finalTotalPayment)}
-            </Typography>
-          </Box>
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
+          {t("Tổng tiền cần thanh toán")}: {formatCurrency(finalTotalPayment)}
+        </Typography>
 
-          {/* Tổng tiền cần thanh toán */}
-          <Typography
-            component="span"
-            variant="h6"
-            sx={{ gridColumn: "span 4" }}
-          >
-            <span style={{ fontWeight: "bold" }}>
-              {t("Tổng tiền cần thanh toán")}:{" "}
-            </span>
-            {formatCurrency(finalTotalPayment)}
-          </Typography>
-
-          {/* payment method */}
-          <FormControl
-            sx={{
-              gridColumn: cardPaymentSelect ? "span 4" : "span 2",
+        <FormControl component="fieldset" sx={{ mt: 2 }}>
+          <FormLabel component="legend">{t("Phương thức thanh toán")}</FormLabel>
+          <RadioGroup
+           row
+            aria-label="payment method"
+            name="paymentMethod"
+            value={values.paymentMethod}
+            onChange={(e) => {
+              const paymentMethod = e.target.value;
+              setCardPaymentSelect(paymentMethod === "CARD");
+              setFieldValue("paymentMethod", paymentMethod);
+              setFieldValue("paymentStatus", paymentMethod === "CASH" ? "UNPAID" : "PAID");
             }}
           >
-            <FormLabel color="warning" id="paymentMethod">
-              Phương thức thanh toán
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="paymentMethod"
-              name="row-radio-buttons-group"
-              value={values.paymentMethod}
-              onChange={(e) => {
-                const paymentMethod = e.target.value;
-                setCardPaymentSelect(paymentMethod === "CARD" ? true : false);
-                setFieldValue("paymentMethod", paymentMethod);
-                if (paymentMethod === "CASH") {
-                  setFieldValue("paymentStatus", "UNPAID");
-                } else setFieldValue("paymentStatus", "PAID");
-              }}
-            >
-              <FormControlLabel
-                value="CASH"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label="Tiền mặt"
-              />
-              <FormControlLabel
-                value="CARD"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label="Thẻ visa"
-              />
-            </RadioGroup>
-            {!cardPaymentSelect && (
-              <FormHelperText sx={{ fontStyle: "italic", fontSize: "12px" }}>
-                * Nhận vé và thanh toán tại quầy
-              </FormHelperText>
-            )}
-          </FormControl>
-        </Box>
-      </Box>
-    </>
+            <FormControlLabel
+              value="CASH"
+              control={<Radio />}
+              label={t("Tiền mặt")}
+            />
+            <FormControlLabel
+              value="CARD"
+              control={<Radio />}
+              label={t("Thẻ visa")}
+            />
+          </RadioGroup>
+          {!cardPaymentSelect && (
+            <Typography variant="caption" sx={{ fontStyle: "italic", mt: 1 }}>
+              * {t("Nhận vé và thanh toán tại quầy")}
+            </Typography>
+          )}
+        </FormControl>
+      </Paper>
+    </LocalizationProvider>
   );
 };
 

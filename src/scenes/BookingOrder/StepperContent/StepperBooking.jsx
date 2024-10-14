@@ -43,6 +43,7 @@ const initialValues = {
   cvv: "", // used to validate when paymentMethod is CARD, remove when submit
   isEditMode: false, // remove this field when submit
   pointsUsed: 0, // Thêm trường pointsUsed
+  cargoRequests: [], 
 };
 
 const renderStepContent = (
@@ -123,6 +124,7 @@ const StepperBooking = () => {
       // Cập nhật totalPayment và pointsUsed từ bookingData
       newValues.totalPayment = bookingData.totalPayment; // Sử dụng giá trị đã cập nhật
       newValues.pointsUsed = bookingData.pointsUsed; // Sử dụng giá trị đã cập nhật
+      newValues.cargoRequests = bookingData.cargoRequests;
 
       console.log("Dữ liệu gửi đi đến backend:", newValues);
 
