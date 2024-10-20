@@ -18,6 +18,7 @@ import {
   Tooltip,
   Select,
   MenuItem,
+  useMediaQuery
 } from "@mui/material";
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -82,9 +83,10 @@ const Topbar = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const [language, setLanguage] = useState("vi"); // Ngôn ngữ hiện tại
+  const [language, setLanguage] = useState("vi");
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Xử lý thay đổi ngôn ngữ
   const handleLanguageChange = (event) => {
@@ -103,9 +105,10 @@ const Topbar = () => {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      p="12px 30px"
-      bgcolor={theme.palette.background.default} // Màu nền từ theme
-      color={theme.palette.text.primary} // Màu chữ từ theme
+      flexDirection={isMobile ? "column" : "row"}
+      p={isMobile ? "10px 15px" : "12px 30px"}
+      bgcolor={theme.palette.background.default}
+      color={theme.palette.text.primary}
     >
       <Box
         sx={{
@@ -113,7 +116,10 @@ const Topbar = () => {
         }}
       >
         {/* ICON */}
-        <Link to="/" style={{ textDecoration: "none", color: theme.palette.text.primary }}>
+        <Link
+          to="/"
+          style={{ textDecoration: "none", color: theme.palette.text.primary }}
+        >
           <Box
             display="flex"
             justifyContent="center"
@@ -186,13 +192,19 @@ const Topbar = () => {
         >
           {t("Vé của tôi")}
         </Button>
-        
+
         {/* Notification */}
         <Notification />
 
         {/* side bar user settings */}
         <IconButton onClick={() => setToggleDrawer(!toggleDrawer)}>
-        <Box display="flex" alignItems="center" gap="5px" color={theme.palette.text.primary}>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap="5px"
+            bgcolor={theme.palette.background.default}
+            color={theme.palette.text.primary}
+          >
             <ManageAccountsOutlinedIcon />
           </Box>
           <Drawer

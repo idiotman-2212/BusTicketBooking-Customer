@@ -140,8 +140,8 @@ const UserSettings = () => {
     <Box mt="100px"
      display="flex"
     justifyContent="center"
-    bgcolor={theme.palette.background.default} // Màu nền từ theme
-      color={theme.palette.text.primary} // Màu chữ từ theme
+    // bgcolor={theme.palette.background.default} // Màu nền từ theme
+    //   color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Box
         display="flex"
@@ -180,7 +180,7 @@ const UserSettings = () => {
                 gridTemplateColumns="repeat(4, 1fr)"
                 gap="30px"
                 p="30px 40px"
-                bgcolor={colors.primary[100]} // Màu nền sử dụng từ theme
+                bgcolor={colors.primary[400]} // Màu nền sử dụng từ theme
                 borderRadius="8px"
               >
                 <TextField
@@ -368,7 +368,7 @@ const UserSettings = () => {
                   <LoadingButton
                     disableRipple
                     disableElevation
-                    color="secondary"
+                    color="success"
                     type="submit"
                     variant="contained"
                     loadingPosition="start"

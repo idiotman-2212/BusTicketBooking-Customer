@@ -142,7 +142,7 @@ const BookingSearch = () => {
   return (
     <Box mt="100px" display="flex" flexDirection="column" gap="20px">
       <Box
-        bgcolor={colors.primary[100]}
+        bgcolor={colors.primary[400]}
         display="flex"
         justifyContent="center"
         borderRadius="6px"
@@ -268,11 +268,11 @@ const BookingSearch = () => {
               sx={{
                 width: "150px",
                 height: "150px",
-                color: colors.greyAccent[500],
+                color: colors.primary[400],
               }}
             />
             <Typography
-              color={colors.greyAccent[500]}
+              color={colors.primary[400]}
               variant="h2"
               fontWeight="bold"
             >
@@ -285,7 +285,7 @@ const BookingSearch = () => {
       <Modal
         sx={{
           "& .MuiBox-root": {
-            bgcolor: colors.primary[100],
+            bgcolor: colors.primary[400],
           },
         }}
         open={openModal}

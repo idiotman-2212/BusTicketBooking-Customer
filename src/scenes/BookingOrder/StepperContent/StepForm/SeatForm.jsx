@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { format, parse } from "date-fns";
 import React from "react";
 import CoachModel from "../../SeatModels/CoachModel";
@@ -6,21 +6,21 @@ import { tokens } from "../../../../theme";
 import { useTranslation } from "react-i18next";
 
 const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
-  const colors = tokens();
-  const {t} = useTranslation
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const { t } = useTranslation();
   const { bookingDateTime, trip } = bookingData;
 
-  //lấy giá cuối cùng sau khi áp mã
+  // Hàm lấy giá cuối cùng sau khi áp dụng mã giảm giá (nếu có)
   const getBookingPriceString = (trip) => {
     let finalPrice = trip.price;
     if (!isNaN(trip?.discount?.amount)) {
       finalPrice -= trip.discount.amount;
     }
-    // nhớ format cho đẹp
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(finalPrice);
+    }).format(finalPrice); // Format giá cho đẹp
   };
 
   const bookingDate = format(
@@ -30,11 +30,11 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
   return (
     <>
-      {/* Summary Trip Info */}
+      {/* Thông tin tóm tắt về chuyến đi */}
       <Box
         mt="15px"
         textAlign="center"
-        bgcolor={colors.greyAccent[300]}
+        bgcolor={colors.primary[400]}
         m="0 60px"
         p="10px 0"
         borderRadius="30px"
@@ -51,8 +51,10 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         <Typography
           component="span"
           variant="h5"
-          color={colors.greyAccent[700]}
-        >{`\u25CF`}</Typography>
+          color={colors.greenAccent[400]}
+        >
+          {`\u25CF`}
+        </Typography>
         <Typography component="span" variant="h5">
           {format(
             parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
@@ -62,22 +64,26 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         <Typography
           component="span"
           variant="h5"
-          color={colors.greyAccent[700]}
-        >{`\u25CF`}</Typography>
+          color={colors.greenAccent[400]}
+        >
+          {`\u25CF`}
+        </Typography>
         <Typography component="span" variant="h5">
           {`${trip.coach.name}, ${trip.coach.coachType}`}
         </Typography>
         <Typography
           component="span"
           variant="h5"
-          color={colors.greyAccent[700]}
-        >{`\u25CF`}</Typography>
+          color={colors.greenAccent[400]}
+        >
+          {`\u25CF`}
+        </Typography>
         <Typography component="span" variant="h5">
           {getBookingPriceString(trip)}
         </Typography>
       </Box>
 
-      {/* Choose seat */}
+      {/* Chọn ghế */}
       <Box mt="30px">
         <CoachModel
           field={field}

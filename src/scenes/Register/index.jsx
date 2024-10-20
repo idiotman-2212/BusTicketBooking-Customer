@@ -114,8 +114,6 @@ const Register = () => {
       justifyContent="center"
       alignItems="center"
       height="600px"
-      bgcolor={theme.palette.background.default} // Màu nền từ theme
-      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Formik
         onSubmit={handleFormSubmit}
@@ -139,7 +137,7 @@ const Register = () => {
               width="400px"
               p="20px"
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              bgcolor={colors.primary[100]}
+              bgcolor={colors.primary[400]}
               borderRadius="8px"
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
@@ -317,7 +315,7 @@ const Register = () => {
                   disableElevation
                   disableRipple
                   variant="contained"
-                  color="secondary"
+                  color="success"
                   type="submit"
                 >
                   {t("Đăng ký")}

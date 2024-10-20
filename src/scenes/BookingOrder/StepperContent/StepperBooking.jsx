@@ -1,6 +1,6 @@
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
@@ -16,6 +16,10 @@ import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
 // import Header from "../../../components/Header";
 import { useTranslation } from "react-i18next";
+import { ColorModeContext, tokens } from "../../../theme";
+import { useContext } from "react";
+import Regulation from "../../Regulation";
+
 
 const initialValues = {
   id: -1,
@@ -44,6 +48,7 @@ const initialValues = {
   isEditMode: false, // remove this field when submit
   pointsUsed: 0, // Thêm trường pointsUsed
   cargoRequests: [], 
+  hasReadRegulations: false,
 };
 
 const renderStepContent = (
@@ -51,7 +56,8 @@ const renderStepContent = (
   field,
   setActiveStep,
   bookingData,
-  setBookingData
+  setBookingData,
+  onOpenRegulations
 ) => {
   switch (step) {
     case 0:
@@ -79,6 +85,7 @@ const renderStepContent = (
           setActiveStep={setActiveStep}
           bookingData={bookingData}
           setBookingData={setBookingData}
+          onOpenRegulations={onOpenRegulations}
         />
       );
     default:
@@ -93,7 +100,21 @@ const StepperBooking = () => {
   const [bookingData, setBookingData] = useState(initialValues);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
-  const {t} = useTranslation();
+  const {t} = useTranslation(); 
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
+  const [showRegulations, setShowRegulations] = useState(false);
+
+
+  const handleOpenRegulations = () => {
+    setShowRegulations(true);
+  };
+
+  // Hàm đóng modal quy định
+  const handleCloseRegulations = () => {
+    setShowRegulations(false);
+  };
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -126,8 +147,6 @@ const StepperBooking = () => {
       newValues.pointsUsed = bookingData.pointsUsed; // Sử dụng giá trị đã cập nhật
       newValues.cargoRequests = bookingData.cargoRequests;
 
-      console.log("Dữ liệu gửi đi đến backend:", newValues);
-
     actions.setSubmitting(false);
 
     createMutation.mutate(newValues, {
@@ -157,7 +176,11 @@ const StepperBooking = () => {
   };
 
   return (
-    <Box m="0">
+    <Box 
+    m="0"
+    bgcolor={theme.palette.background.default} // Màu nền từ theme
+    color={theme.palette.text.primary} // Màu chữ từ theme
+    >
       {/* <Header title={undefined} subTitle={"CREATE BOOKING"} /> */}
 
       <Box mt="100px">
@@ -193,7 +216,8 @@ const StepperBooking = () => {
                     rest,
                     setActiveStep,
                     bookingData,
-                    setBookingData
+                    setBookingData,
+                    handleOpenRegulations 
                   )}
                 </Box>
                 <Box mt="20px" display="flex" justifyContent="center">
@@ -201,7 +225,7 @@ const StepperBooking = () => {
                     <Button
                       disableElevation
                       disableRipple
-                      color="secondary"
+                      color="success"
                       variant="contained"
                       onClick={handleBack}
                     >
@@ -227,6 +251,7 @@ const StepperBooking = () => {
           </Formik>
         )}
       </Box>
+      <Regulation open={showRegulations} onClose={handleCloseRegulations} />
     </Box>
   );
 };

@@ -9,28 +9,37 @@ import {
   Grid,
   FormControl,
   FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
   FormLabel,
   Radio,
   RadioGroup,
   InputAdornment,
   Divider,
   Paper,
+  useTheme,
+  Checkbox,
+  Link,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
-import { useTheme } from "@mui/material/styles";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import EventSeatIcon from "@mui/icons-material/EventSeat";
 import PaymentIcon from "@mui/icons-material/Payment";
-import LoyaltyIcon from "@mui/icons-material/Loyalty";
+import StarsIcon from "@mui/icons-material/Stars";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import * as userApi from "../../../../queries/user/userQueries";
 import * as loyaltyApi from "../../../../queries/loyalty/loyaltyQueries";
 import * as cargoApi from "../../../../queries/cargo/cargoQueries";
+import { ColorModeContext, tokens } from "../../../../theme";
+import { useContext } from "react";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -47,24 +56,39 @@ const getBookingPrice = (trip) => {
   return finalPrice;
 };
 
-const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
+const PaymentForm = ({
+  field,
+  setActiveStep,
+  bookingData,
+  setBookingData,
+  onOpenRegulations,
+}) => {
   const theme = useTheme();
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
   const { t } = useTranslation();
   const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
-  const { values, errors, touched, setFieldValue, handleChange, handleBlur } = field;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
+    field;
   const [errorMessage, setErrorMessage] = useState("");
-  const [cardPaymentSelect, setCardPaymentSelect] = useState(bookingData.paymentMethod === "CARD");
+  const [cardPaymentSelect, setCardPaymentSelect] = useState(
+    bookingData.paymentMethod === "CARD" ? true : false
+  );
   const [availablePoints, setAvailablePoints] = useState(0);
   const [pointsToUse, setPointsToUse] = useState("");
   const [finalTotalPayment, setFinalTotalPayment] = useState(totalPayment);
   const [pointsApplied, setPointsApplied] = useState(false);
-  const [originalTotalPayment, setOriginalTotalPayment] = useState(totalPayment);
+  const [originalTotalPayment, setOriginalTotalPayment] =
+    useState(totalPayment);
   const [selectedServices, setSelectedServices] = useState({});
 
   const isLoggedIn = true; // Replace with your actual login check
   const loggedInUsername = localStorage.getItem("loggedInUsername");
 
-  const { data: cargos, isLoading } = useQuery(["cargos"], cargoApi.getAllCargos);
+  const { data: cargos, isLoading } = useQuery(
+    ["cargos"],
+    cargoApi.getAllCargos
+  );
 
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
@@ -75,7 +99,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const loyaltyPointsQuery = useQuery({
     queryKey: ["loyaltyPoints"],
     queryFn: () => loyaltyApi.getLoyaltyPoints(),
-    enabled: !!loggedInUsername,  // kiểm tra kỹ
+    enabled: !!loggedInUsername, // kiểm tra kỹ
   });
 
   useEffect(() => {
@@ -98,39 +122,40 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
   const calculateTotalPayment = () => {
     let total = originalTotalPayment; // Lấy tổng tiền gốc ban đầu (giá vé)
-    console.log("Giá vé ban đầu: ", total);
 
     // Tính tổng chi phí cho các dịch vụ bổ sung (cargos)
     Object.entries(selectedServices).forEach(([cargoId, quantity]) => {
-      if (quantity > 0) { // Chỉ tính khi số lượng > 0
-        const cargo = cargos.find(c => c.id === parseInt(cargoId));
+      if (quantity > 0) {
+        // Chỉ tính khi số lượng > 0
+        const cargo = cargos.find((c) => c.id === parseInt(cargoId));
         if (cargo) {
           total += cargo.basePrice * quantity;
         }
       }
     });
-    console.log("Tổng tiền sau khi thêm dịch vụ: ", total);
     return total;
   };
 
   const handleServiceChange = (id, quantity) => {
-    if (quantity >= 0) { // Chỉ thay đổi nếu số lượng >= 0
-      setSelectedServices(prev => {
+    if (quantity >= 0) {
+      // Chỉ thay đổi nếu số lượng >= 0
+      setSelectedServices((prev) => {
         const newServices = { ...prev, [id]: quantity };
 
         // Tính toán lại tổng tiền khi có thay đổi dịch vụ
         const newTotal = calculateTotalPayment();
-        console.log("Giá tiền sau khi thêm dịch vụ: ", newTotal);
 
         // Cập nhật tổng tiền và các dịch vụ đã chọn trong bookingData
         setFinalTotalPayment(newTotal);
-        setBookingData(prevData => ({
+        setBookingData((prevData) => ({
           ...prevData,
           totalPayment: newTotal,
-          cargoRequests: Object.entries(newServices).map(([cargoId, quantity]) => ({
-            cargoId: parseInt(cargoId),
-            quantity
-          }))
+          cargoRequests: Object.entries(newServices).map(
+            ([cargoId, quantity]) => ({
+              cargoId: parseInt(cargoId),
+              quantity,
+            })
+          ),
         }));
 
         return newServices;
@@ -141,13 +166,15 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   useEffect(() => {
     const newTotal = calculateTotalPayment();
     setFinalTotalPayment(newTotal);
-    setBookingData(prevData => ({
+    setBookingData((prevData) => ({
       ...prevData,
       totalPayment: newTotal,
-      cargoRequests: Object.entries(selectedServices).map(([cargoId, quantity]) => ({
-        cargoId: parseInt(cargoId),
-        quantity
-      }))
+      cargoRequests: Object.entries(selectedServices).map(
+        ([cargoId, quantity]) => ({
+          cargoId: parseInt(cargoId),
+          quantity,
+        })
+      ),
     }));
   }, [selectedServices]);
 
@@ -160,7 +187,9 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
 
     if (pointsToApply > availablePoints) {
-      setErrorMessage(t("Số điểm không hợp lệ hoặc vượt quá số điểm có thể sử dụng."));
+      setErrorMessage(
+        t("Số điểm không hợp lệ hoặc vượt quá số điểm có thể sử dụng.")
+      );
       return;
     }
 
@@ -173,7 +202,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     const newTotal = Math.max(finalTotalPayment - pointsToApply, 0);
     console.log("Tổng tiền sau khi áp dụng điểm xu: ", newTotal);
 
-    setBookingData(prevData => ({
+    setBookingData((prevData) => ({
       ...prevData,
       totalPayment: newTotal,
       pointsUsed: pointsToApply,
@@ -190,7 +219,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     setPointsApplied(false);
     setPointsToUse("");
 
-    setBookingData(prevData => ({
+    setBookingData((prevData) => ({
       ...prevData,
       totalPayment: newTotal,
       pointsUsed: 0,
@@ -213,11 +242,9 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
   }, [pointsToUse]);
 
-  console.log("Tổng tiền cuối cùng sau khi tính tất cả: ", finalTotalPayment);
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+      <Box elevation={3} sx={{ p: 4, mt: 4 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={5}>
             <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -226,33 +253,43 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body1" gutterBottom>
-                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  <strong>{t("Tuyến")}:</strong> {`${trip?.source?.name ?? ''} ${
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>{t("Tuyến")}:</strong>{" "}
+                  {`${trip?.source?.name ?? ""} ${
                     bookingData.bookingType === "ONEWAY" ? `→` : `↔`
-                  } ${trip?.destination?.name ?? ''}`}
+                  } ${trip?.destination?.name ?? ""}`}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  <strong>{t("Xe")}:</strong> {trip?.coach?.name ?? ''}
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>{t("Xe")}:</strong> {trip?.coach?.name ?? ""}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  <strong>{t("Loại")}:</strong> {trip?.coach?.coachType ?? ''}
+                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>{t("Loại")}:</strong> {trip?.coach?.coachType ?? ""}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  <CalendarMonthIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <CalendarMonthIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Ngày giờ đi")}:</strong>{" "}
                   {trip?.departureDateTime
-                    ? format(parse(trip?.departureDateTime, "yyyy-MM-dd HH:mm", new Date()), "HH:mm dd-MM-yyyy")
-                    : ''}
+                    ? format(
+                        parse(
+                          trip?.departureDateTime,
+                          "yyyy-MM-dd HH:mm",
+                          new Date()
+                        ),
+                        "HH:mm dd-MM-yyyy"
+                      )
+                    : ""}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  <PaymentIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <PaymentIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Tổng tiền")}:</strong>{" "}
-                  {`${formatCurrency(originalTotalPayment)} (${seatNumber.length} x ${formatCurrency(getBookingPrice(trip))})`}
+                  {`${formatCurrency(originalTotalPayment)} (${
+                    seatNumber.length
+                  } x ${formatCurrency(getBookingPrice(trip))})`}
                 </Typography>
                 <Typography variant="body1">
-                  <EventSeatIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <EventSeatIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Ghế")}:</strong> {seatNumber.join(", ")}
                 </Typography>
               </CardContent>
@@ -330,23 +367,46 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 />
               </Grid>
             </Grid>
+            {/* Checkbox Xác Nhận Quy Định */}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={values.hasReadRegulations}
+                  onChange={handleChange}
+                  name="hasReadRegulations"
+                  color="primary"
+                />
+              }
+              label={
+                <Typography>
+                  {t("Tôi đã đọc và đồng ý với các quy định của nhà xe.")}{" "}
+                  <Link href="#" onClick={onOpenRegulations}>
+                    {t("Nội quy của nhà xe")}
+                  </Link>
+                </Typography>
+              }
+            />
 
             <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
-              {t("Choose Additional Services")}
+              {t("Chọn dịch vụ bổ sung")}
             </Typography>
-            <Box sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
+            <Box sx={{ maxHeight: 200, overflowY: "auto", mb: 2 }}>
               {cargos?.map((cargo) => (
                 <Card key={cargo.id} variant="outlined" sx={{ mb: 1, p: 1 }}>
                   <Grid container alignItems="center" spacing={2}>
                     <Grid item xs={8}>
-                      <Typography>{cargo.name} - {formatCurrency(cargo.basePrice)}</Typography>
+                      <Typography>
+                        {cargo.name} - {formatCurrency(cargo.basePrice)}
+                      </Typography>
                     </Grid>
                     <Grid item xs={4}>
                       <TextField
                         type="number"
                         size="small"
                         value={selectedServices[cargo.id] ?? 0}
-                        onChange={(e) => handleServiceChange(cargo.id, Number(e.target.value))}
+                        onChange={(e) =>
+                          handleServiceChange(cargo.id, Number(e.target.value))
+                        }
                         inputProps={{ min: 0 }}
                         fullWidth
                       />
@@ -363,7 +423,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="body1">
-              <LoyaltyIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              <StarsIcon sx={{ mr: 1, verticalAlign: "middle" }} />
               {t("Số điểm xu của bạn")}: {formatCurrency(availablePoints)}
             </Typography>
           </Grid>
@@ -384,7 +444,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               <Grid item xs={4}>
                 <Button
                   variant="contained"
-                  color="primary"
+                  color="success"
                   onClick={applyLoyaltyPoints}
                   disabled={pointsApplied}
                   fullWidth
@@ -413,28 +473,50 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         </Typography>
 
         <FormControl component="fieldset" sx={{ mt: 2 }}>
-          <FormLabel component="legend">{t("Phương thức thanh toán")}</FormLabel>
+          <FormLabel component="legend">
+            {t("Phương thức thanh toán")}
+          </FormLabel>
           <RadioGroup
-           row
+            row
             aria-label="payment method"
             name="paymentMethod"
             value={values.paymentMethod}
             onChange={(e) => {
               const paymentMethod = e.target.value;
-              setCardPaymentSelect(paymentMethod === "CARD");
+              setCardPaymentSelect(paymentMethod === "CARD" ? true : false);
               setFieldValue("paymentMethod", paymentMethod);
-              setFieldValue("paymentStatus", paymentMethod === "CASH" ? "UNPAID" : "PAID");
+              if (paymentMethod === "CASH") {
+                setFieldValue("paymentStatus", "UNPAID");
+              } else setFieldValue("paymentStatus", "PAID");
             }}
           >
             <FormControlLabel
               value="CASH"
-              control={<Radio />}
-              label={t("Tiền mặt")}
+              control={
+                <Radio
+                  sx={{
+                    color: "#00a0bd",
+                    "&.Mui-checked": {
+                      color: "#00a0bd",
+                    },
+                  }}
+                />
+              }
+              label="Tiền mặt"
             />
             <FormControlLabel
               value="CARD"
-              control={<Radio />}
-              label={t("Thẻ visa")}
+              control={
+                <Radio
+                  sx={{
+                    color: "#00a0bd",
+                    "&.Mui-checked": {
+                      color: "#00a0bd",
+                    },
+                  }}
+                />
+              }
+              label="Thẻ visa"
             />
           </RadioGroup>
           {!cardPaymentSelect && (
@@ -443,7 +525,115 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             </Typography>
           )}
         </FormControl>
-      </Paper>
+
+        {/* thẻ visa */}
+        <FormControl
+          sx={{
+            display: cardPaymentSelect ? "initial" : "none",
+            gridColumn: "span 2",
+            borderRadius: "10px",
+            padding: "16px",
+          }}
+        >
+          <Card
+            sx={{
+              p: 2,
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.text.primary, 
+              boxShadow: theme.shadows[2],
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={2}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                {t("Thông tin thẻ Visa")}
+              </Typography>
+              <img
+                src="../../../../../public/visa.png"
+                alt="Visa"
+                width="50"
+                style={{
+                  filter: theme.palette.mode === "dark" ? "invert(1)" : "none", // Đảo màu logo trong dark mode
+                }}
+              />
+            </Box>
+
+            {/* Tên chủ thẻ */}
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Tên chủ thẻ *"
+              value={values.nameOnCard}
+              onBlur={handleBlur}
+              onChange={(e) => setFieldValue("nameOnCard", e.target.value)}
+              error={!!touched.nameOnCard && !!errors.nameOnCard}
+              helperText={touched.nameOnCard && errors.nameOnCard}
+              sx={{ mb: 2 }}
+            />
+
+            {/* Số thẻ */}
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Số thẻ *"
+              value={values.cardNumber}
+              onBlur={handleBlur}
+              onChange={(e) => setFieldValue("cardNumber", e.target.value)}
+              error={!!touched.cardNumber && !!errors.cardNumber}
+              helperText={touched.cardNumber && errors.cardNumber}
+              sx={{ mb: 2 }}
+            />
+
+            {/* Ngày hết hạn và CVV */}
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    format="MM/yy"
+                    label="Ngày hết hạn"
+                    views={["year", "month"]}
+                    openTo="month"
+                    minDate={new Date()}
+                    value={parse(values.expiredDate, "MM/yy", new Date())}
+                    onChange={(newDate) => {
+                      setFieldValue("expiredDate", format(newDate, "MM/yy"));
+                    }}
+                    slotProps={{
+                      textField: {
+                        InputProps: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <CalendarMonthIcon />
+                            </InputAdornment>
+                          ),
+                        },
+                        fullWidth: true,
+                        error: !!touched.expiredDate && !!errors.expiredDate,
+                      },
+                    }}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="CVV *"
+                  value={values.cvv}
+                  onBlur={handleBlur}
+                  onChange={(e) => setFieldValue("cvv", e.target.value)}
+                  error={!!touched.cvv && !!errors.cvv}
+                  helperText={touched.cvv && errors.cvv}
+                />
+              </Grid>
+            </Grid>
+          </Card>
+        </FormControl>
+      </Box>
     </LocalizationProvider>
   );
 };

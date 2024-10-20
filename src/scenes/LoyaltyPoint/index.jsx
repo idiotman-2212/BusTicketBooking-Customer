@@ -24,6 +24,7 @@ import {
   Paper,
   useTheme,
   Container,
+  Button,
 } from "@mui/material";
 import { getLoyaltyTransactions } from "../../queries/loyalty/loyaltyQueries";
 import { useQuery } from "@tanstack/react-query";
@@ -37,6 +38,7 @@ import * as ticketApi from "../../queries/booking/ticketQueries";
 import CustomToolTip from "../../global/CustomToolTip";
 import { getLoyaltyPoints } from "../../queries/loyalty/loyaltyQueries";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const modalStyle = {
   position: "absolute",
@@ -82,6 +84,7 @@ const LoyaltyPoint = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -134,7 +137,7 @@ const LoyaltyPoint = () => {
         alignItems="center"
         minHeight="100vh"
         bgcolor={theme.palette.background.default} // Màu nền từ theme
-        color={theme.palette.text.secondary} // Màu chữ từ theme
+        color={theme.palette.text.primary} // Màu chữ từ theme
       >
         <CircularProgress />
       </Box>
@@ -149,7 +152,7 @@ const LoyaltyPoint = () => {
         alignItems="center"
         minHeight="100vh"
         bgcolor={theme.palette.background.default} // Màu nền từ theme
-        color={theme.palette.text.secondary} // Màu chữ từ theme
+        color={theme.palette.text.primary} // Màu chữ từ theme
       >
         <Typography color="error">{error}</Typography>
       </Box>
@@ -160,24 +163,46 @@ const LoyaltyPoint = () => {
     <Box
       p={3}
       bgcolor={theme.palette.background.default} // Màu nền từ theme
-      color={theme.palette.text.secondary} // Màu chữ từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Paper elevation={3} sx={{ padding: 3, marginBottom: 2 }}>
-        <Typography
-          variant="h4"
-          color={colors.grey[800]}
-          fontWeight="bold"
-          marginBottom="5px"
+      <Box display="flex" justifyContent="space-between" alignItems="center"> {/* Sử dụng Flexbox */}
+        <Box>
+          <Typography
+            variant="h4"
+            color={colors.greenAccent[400]}
+            fontWeight="bold"
+            marginBottom={1} // Thay đổi để tạo khoảng cách dưới tiêu đề
+          >
+            {t("Số Xu Hiện Có")}:{" "}
+            <strong>
+              {formatCurrency(loyaltyPointsQuery.data.loyaltyPoints)}
+            </strong>
+          </Typography>
+          <Typography
+            variant="h5"
+            color={colors.grey[100]}
+          >
+            {t("Lịch Sử Giao Dịch")}
+          </Typography>
+        </Box>
+
+        {/* Nút bấm chuyển đến giao diện Report */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/report")} // Chuyển hướng đến trang Report
+          sx={{
+            padding: "10px 20px", // Điều chỉnh padding của nút
+            fontSize: "16px", // Thay đổi kích thước chữ cho nút
+            fontWeight: "bold", // Để chữ đậm hơn
+            borderRadius: "8px", // Tạo góc bo tròn cho nút
+          }}
         >
-          {t("Số Xu Hiện Có")}:{" "}
-          <strong>
-            {formatCurrency(loyaltyPointsQuery.data.loyaltyPoints)}
-          </strong>
-        </Typography>
-        <Typography variant="h5" color={colors.grey[600]}>
-          {t("Lịch Sử Giao Dịch")}
-        </Typography>
-      </Paper>
+          {t("Thống Kê")} {/* Sử dụng hàm dịch để hiển thị văn bản */}
+        </Button>
+      </Box>
+    </Paper>
 
       <TableContainer
         component={Paper}
@@ -186,21 +211,17 @@ const LoyaltyPoint = () => {
       >
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: theme.palette.primary.main }}>
-              {/* <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.primary[700],
-                }}
-              >
-                {t("ID Vé Đặt")}
-              </TableCell> */}
+            <TableRow
+              sx={{
+                bgcolor: "background.default",
+                color: "text.primary",
+              }}
+            >
               <TableCell
                 sx={{
                   fontSize: "1rem",
                   fontWeight: "bold",
-                  color: colors.primary[700],
+                  color: colors.grey[100],
                 }}
               >
                 {t("Người Dùng")}
@@ -209,7 +230,7 @@ const LoyaltyPoint = () => {
                 sx={{
                   fontSize: "1rem",
                   fontWeight: "bold",
-                  color: colors.primary[700],
+                  color: colors.grey[100],
                 }}
               >
                 {t("Số Xu")}
@@ -218,7 +239,7 @@ const LoyaltyPoint = () => {
                 sx={{
                   fontSize: "1rem",
                   fontWeight: "bold",
-                  color: colors.primary[700],
+                  color: colors.grey[100],
                 }}
               >
                 {t("Ngày Giao Dịch")}
@@ -227,17 +248,17 @@ const LoyaltyPoint = () => {
                 sx={{
                   fontSize: "1rem",
                   fontWeight: "bold",
-                  color: colors.primary[700],
+                  color: colors.grey[100],
                 }}
               >
                 {t("Loại Giao Dịch")}
               </TableCell>
-              
+
               <TableCell
                 sx={{
                   fontSize: "1rem",
                   fontWeight: "bold",
-                  color: colors.primary[700],
+                  color: colors.grey[100],
                 }}
               >
                 {t("Chuyến Đi")}
@@ -302,7 +323,6 @@ const LoyaltyPoint = () => {
                       : t("Sử Dụng Điểm")}
                   </TableCell>
 
-                  
                   <TableCell>
                     <Box
                       display="flex"

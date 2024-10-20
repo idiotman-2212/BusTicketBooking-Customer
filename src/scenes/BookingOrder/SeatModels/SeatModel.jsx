@@ -4,30 +4,30 @@ import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 
 const SeatModel = (props) => {
-  const { seat, handleSeatChoose, coachType, selectedSeats, orderedSeats } =
-    props;
+  const { seat, handleSeatChoose, coachType, selectedSeats, orderedSeats } = props;
   const { name, choose } = seat;
   const isOrdered = orderedSeats.includes(name);
   const isChosen = selectedSeats.includes(name);
-  const {t}  = useTranslation();
+  const { t } = useTranslation();
 
-  //màu sắc ghế
+  // Màu sắc ghế dựa trên trạng thái
   const getSeatStateColor = () => {
-    if (!isOrdered) {
-      if (!isChosen) return "#979797"; // grey
-      else return "#ff4138"; // red
-    }
+    if (isOrdered) return "#000"; // Màu đen cho ghế đã đặt
+    if (isChosen) return "#ff4138"; // Màu đỏ cho ghế đang chọn
+    return "#979797"; // Màu xám cho ghế trống
   };
 
   return (
     <Box
       onClick={() => {
-        handleSeatChoose(
-          name,
-          name.startsWith("A") ? "DOWN_STAIR" : "UP_STAIR",
-          !isChosen,
-          isOrdered
-        );
+        if (!isOrdered) {
+          handleSeatChoose(
+            name,
+            name.startsWith("A") ? "DOWN_STAIR" : "UP_STAIR",
+            !isChosen,
+            isOrdered
+          );
+        }
       }}
       component="div"
       position="relative"
@@ -39,7 +39,7 @@ const SeatModel = (props) => {
       }
       sx={{
         cursor: isOrdered ? "not-allowed" : "pointer",
-        color: getSeatStateColor,
+        color: getSeatStateColor(),
         gridColumn:
           (name === "A1" || name === "B1") &&
           (coachType === "LIMOUSINE" || coachType === "BED")

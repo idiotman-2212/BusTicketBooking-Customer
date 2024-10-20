@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -9,18 +9,36 @@ import { tokens, ColorModeContext } from "../../theme";
 import Paragraph from "../../global/Paragraph";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
-import { useContext } from "react";
+import Regulation from "../Regulation"; // Import Regulation component
 
 const LandingPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
   const { t } = useTranslation();
+  const [openRegulations, setOpenRegulations] = useState(false);
+
+  useEffect(() => {
+    // Kiểm tra trạng thái "vừa đăng nhập" từ localStorage
+    const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+    const hasReadRegulations = localStorage.getItem("hasReadRegulations") === "true";
+
+    // Nếu người dùng vừa đăng nhập và chưa đọc quy định, hiển thị modal
+    if (isLoggedIn && !hasReadRegulations) {
+      setOpenRegulations(true);
+      localStorage.removeItem("loggedIn"); // Xóa trạng thái "vừa đăng nhập" để tránh hiển thị lại modal
+    }
+  }, []);
+
+  const handleRegulationsClose = () => {
+    setOpenRegulations(false);
+    localStorage.setItem("hasReadRegulations", "true"); // Lưu trạng thái đã đọc quy định
+  };
 
   return (
     <Box 
-    mt="100px"
-    bgcolor={theme.palette.background.default} // Màu nền từ theme
+      mt="100px"
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
       color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Swiper
@@ -69,7 +87,7 @@ const LandingPage = () => {
         </SwiperSlide>
       </Swiper>
 
-      <Box bgcolor={colors.blueAccent[100]} mt="40px" borderRadius="8px">
+      <Box bgcolor={colors.primary[400]} mt="40px" borderRadius="8px">
         <Paragraph
           title={t("Đặt vé trực tuyến trên DATVEXE")}
           content={t("Hầu hết khách du lịch Việt Nam thích đi du lịch đến điểm đến ưa thích của họ bằng đường bộ. Đó là do thực tế là một chuyến đi đường cho phép bạn thưởng thức vẻ đẹp phong cảnh theo tốc độ của riêng bạn. Hơn nữa, sự thoải mái khi đi trên một chiếc xe cùng gia đình và bạn bè của bạn là không gì sánh được. Bạn có thể chọn đặt xe taxi trực tuyến sẽ giúp hành trình của bạn không gặp rắc rối. Bạn chỉ cần truy cập cổng DATVEXE và chọn một chiếc taxi.")}
@@ -91,6 +109,9 @@ const LandingPage = () => {
           content={t("Mỗi người đang tìm kiếm một trải nghiệm đáng tin cậy, ưu tiên các nhu cầu và mối quan tâm của họ. Đó là lý do tại sao, DATVEXE cung cấp trải nghiệm tuyệt vời cho người dùng khi họ đặt taxi trực tuyến. Bạn có thể kết nối với dịch vụ hỗ trợ khách hàng 24/7 của DATVEXE và giải quyết tất cả các thắc mắc liên quan đến đặt phòng của bạn. Từ việc cung cấp các dịch vụ tốt nhất để đảm bảo một chuyến đi an toàn, DATVEXE đảm bảo rằng chuyến đi của bạn sẽ thú vị.")}
         />
       </Box>
+
+      {/* Gọi component Regulation và điều khiển mở/đóng modal từ LandingPage */}
+      <Regulation open={openRegulations} onClose={handleRegulationsClose} />
     </Box>
   );
 };

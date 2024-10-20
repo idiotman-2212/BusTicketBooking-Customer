@@ -6,13 +6,15 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import StarsIcon from "@mui/icons-material/Stars";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined"; // Icon cho đăng ký
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@mui/material/styles"; // Thêm useTheme để quản lý theme
-import { tokens } from "../theme"; // Sử dụng tokens để truy cập màu sắc tuỳ vào chế độ sáng/tối
+import { useTheme } from "@mui/material";
+import { ColorModeContext, tokens } from "../theme";
+import React, { useContext } from "react";
 
 const UserDrawerItems = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode); // Lấy màu sắc dựa trên chế độ sáng/tối
+  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colorMode = useContext(ColorModeContext);
 
   return [
     {
@@ -21,7 +23,7 @@ const UserDrawerItems = () => {
       to: "/my_loyalty",
       icon: StarsIcon,
       requireLogin: true,
-      color: colors.grey[100], // Áp dụng màu sắc cho chế độ tối
+      color: colors.primary[400], // Áp dụng màu sắc cho chế độ tối
     },
     {
       label: t("Chỉnh sửa thông tin"),
@@ -29,7 +31,7 @@ const UserDrawerItems = () => {
       to: "/settings",
       icon: SettingsOutlinedIcon,
       requireLogin: true,
-      color: colors.primary[500], // Sử dụng màu từ primary cho chế độ tối
+      color: colors.primary[400], // Sử dụng màu từ primary cho chế độ tối
     },
     {
       label: t("Đổi mật khẩu"),
@@ -37,7 +39,7 @@ const UserDrawerItems = () => {
       to: "/change-password",
       icon: PasswordIcon,
       requireLogin: true,
-      color: colors.grey[200], // Màu sắc của item
+      color: colors.primary[400], // Màu sắc của item
     },
     {
       label: t("Đăng xuất"),
@@ -45,7 +47,7 @@ const UserDrawerItems = () => {
       to: "/logout",
       icon: LogoutOutlinedIcon,
       requireLogin: true,
-      color: colors.greenAccent[500], 
+      color: colors.primary[400], 
     },
     {
       label: t("Đăng nhập"),
@@ -53,7 +55,7 @@ const UserDrawerItems = () => {
       to: "/login",
       icon: VpnKeyOutlinedIcon,
       requireLogin: false,
-      color: colors.greenAccent[500], // Màu xanh nhấn cho đăng nhập
+      color: colors.primary[400], // Màu xanh nhấn cho đăng nhập
     },
     {
       label: t("Đăng ký"),
@@ -61,7 +63,7 @@ const UserDrawerItems = () => {
       to: "/register",
       icon: PersonAddAltOutlinedIcon,
       requireLogin: false,
-      color: colors.blueAccent[500], // Màu xanh dương nhạt cho đăng ký
+      color: colors.primary[400], // Màu xanh dương nhạt cho đăng ký
     },
     {
       label: t("Quên mật khẩu"),
@@ -69,7 +71,7 @@ const UserDrawerItems = () => {
       to: "/forgot",
       icon: LockResetIcon,
       requireLogin: false,
-      color: colors.grey[300], // Màu xám cho quên mật khẩu
+      color: colors.primary[400], // Màu xám cho quên mật khẩu
     },
   ];
 };

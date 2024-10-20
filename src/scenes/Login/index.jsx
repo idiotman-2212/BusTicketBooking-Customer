@@ -71,6 +71,7 @@ const Login = () => {
         const accessToken = data.token;
         localStorage.setItem("accessToken", accessToken);
         handleToast("success", t("Đăng nhập thành công"));
+        localStorage.setItem("loggedIn", "true");
         // get user info
         localStorage.setItem("loggedInUsername", values.username);
 
@@ -93,8 +94,6 @@ const Login = () => {
       justifyContent="center"
       alignItems="center"
       height="500px"
-      bgcolor={theme.palette.background.default} // Màu nền từ theme
-      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       <Formik
         onSubmit={handleFormSubmit}
@@ -118,7 +117,7 @@ const Login = () => {
               width="400px"
               p="20px"
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              bgcolor={colors.primary[100]}
+              bgcolor={colors.primary[400]}
               borderRadius="8px"
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
@@ -189,7 +188,7 @@ const Login = () => {
                   disableElevation
                   disableRipple
                   variant="contained"
-                  color="secondary"
+                  color="success"
                   type="submit"
                 >
                   {t("Đăng nhập")}

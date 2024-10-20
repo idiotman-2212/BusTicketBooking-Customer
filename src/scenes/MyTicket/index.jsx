@@ -127,7 +127,7 @@ const MyTicket = () => {
             gridTemplateColumns="repeat(12, 1fr)"
             gap="30px"
             p="50px"
-            bgcolor={colors.primary[100]}
+            bgcolor={colors.primary[400]}
             sx={{
               width: "100%",
               position: "relative",
@@ -220,11 +220,11 @@ const MyTicket = () => {
               sx={{
                 width: "150px",
                 height: "150px",
-                color: colors.greyAccent[500],
+                color: colors.primary[400],
               }}
             />
             <Typography
-              color={colors.greyAccent[500]}
+              color={colors.primary[400]}
               variant="h2"
               fontWeight="bold"
             >

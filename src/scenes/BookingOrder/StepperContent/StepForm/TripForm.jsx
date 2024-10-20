@@ -68,7 +68,8 @@ const MAX_PRICE = 1_000_000;
 const MIN_PRICE_DISTANCE = 10_000;
 
 const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const {t} = useTranslation();
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [findClicked, setFindClicked] = useState(false);
@@ -317,7 +318,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         gap="30px"
         borderRadius="4px"
         gridTemplateColumns="repeat(12, 1fr)"
-        bgcolor={colors.primary[100]}
+        bgcolor={colors.primary[400]}
       >
         {/* choose location */}
         <Box
@@ -455,7 +456,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                   dialog: {
                     sx: {
                       "& .MuiButton-root": {
-                        color: colors.greyAccent[100],
+                        color: colors.primary[400],
                       },
                     },
                   },
@@ -491,7 +492,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                   dialog: {
                     sx: {
                       "& .MuiButton-root": {
-                        color: colors.greyAccent[100],
+                        color: colors.primary[400],
                       },
                     },
                   },
@@ -588,7 +589,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           borderRadius="4px"
           gridColumn="span 1"
           pb="30px"
-          bgcolor={colors.primary[100]}
+          bgcolor={colors.primary[400]}
         >
           <Box
             display="flex"
@@ -599,7 +600,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <Typography
               variant="h5"
               fontWeight="bold"
-              color={colors.greenAccent[600]}
+              color={colors.greenAccent[400]}
             >
               {t("BỘ LỌC")} ({tripList.length})
             </Typography>
@@ -619,11 +620,11 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               onClick={() => handleTimeBoxChange("00:00", "06:00")}
               textAlign="center"
               p="2px 0"
-              border={`4px solid ${colors.greyAccent[300]}`}
+              border={`4px solid ${colors.greenAccent[400]}`}
               borderRadius="15px"
               bgcolor={
                 prevTimeBox.current?.startTime === "00:00"
-                  ? colors.greenAccent[200]
+                  ? colors.greenAccent[400]
                   : undefined
               }
               sx={{
@@ -637,11 +638,11 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               onClick={() => handleTimeBoxChange("06:01", "12:00")}
               textAlign="center"
               p="2px 0"
-              border={`4px solid ${colors.greyAccent[300]}`}
+              border={`4px solid ${colors.greenAccent[400]}`}
               borderRadius="15px"
               bgcolor={
                 prevTimeBox.current?.startTime === "06:01"
-                  ? colors.greenAccent[200]
+                  ? colors.greenAccent[400]
                   : undefined
               }
               sx={{
@@ -655,11 +656,11 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               onClick={() => handleTimeBoxChange("12:01", "18:00")}
               textAlign="center"
               p="2px 0"
-              border={`4px solid ${colors.greyAccent[300]}`}
+              border={`4px solid ${colors.greenAccent[400]}`}
               borderRadius="15px"
               bgcolor={
                 prevTimeBox.current?.startTime === "12:01"
-                  ? colors.greenAccent[200]
+                  ? colors.greenAccent[400]
                   : undefined
               }
               sx={{
@@ -673,11 +674,11 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               onClick={() => handleTimeBoxChange("18:01", "23:59")}
               textAlign="center"
               p="2px 0"
-              border={`4px solid ${colors.greyAccent[300]}`}
+              border={`4px solid ${colors.greenAccent[400]}`}
               borderRadius="15px"
               bgcolor={
                 prevTimeBox.current?.startTime === "18:01"
-                  ? colors.greenAccent[200]
+                  ? colors.greenAccent[400]
                   : undefined
               }
               sx={{
@@ -788,21 +789,21 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           mt="20px"
                           p="6px 10px"
                           borderRadius="30px"
-                          bgcolor={colors.greyAccent[300]}
+                          bgcolor={colors.primary[400]}
                         >
                           <Typography variant="h5">
                             {getBookingPriceString(trip)}
                           </Typography>
                           <Typography
                             variant="h5"
-                            color={colors.greyAccent[600]}
+                            color={colors.greenAccent[400]}
                           >{`\u25CF`}</Typography>
                           <Typography variant="h5">
                             {trip.coach.coachType}
                           </Typography>
                           <Typography
                             variant="h5"
-                            color={colors.greyAccent[600]}
+                            color={colors.greenAccent[400]}
                           >{`\u25CF`}</Typography>
                           <Typography variant="h5">
                             {t("Còn lại")}:{" "}
@@ -863,7 +864,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               justifyContent="center"
               alignItems="center"
               sx={{
-                color: colors.greyAccent[400],
+                color: colors.primary[400],
               }}
             >
               <DoNotDisturbAltOutlinedIcon

@@ -44,6 +44,11 @@ const getSeatBooking = async (tripId) => {
     return resp.data;
 }
 
+const getAvailableSeats = async (tripId) => {
+    const resp = await http.get(`/bookings/available-seats/${tripId}`)
+    return resp.data
+}
+
 const getBooking = async (bookingId) => {
     const resp = await http.get(`/bookings/${bookingId}`)
     return resp.data

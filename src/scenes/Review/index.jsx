@@ -76,8 +76,6 @@ import {
         boxShadow="0 4px 8px rgba(0,0,0,0.1)"
         maxWidth="600px"
         mx="auto"
-        bgcolor={theme.palette.background.default} // Màu nền từ theme
-        color={theme.palette.text.secondary} // Màu chữ từ theme
       >
         <Typography variant="h3" fontWeight='bold' textAlign="center" mb={4} color="black">
           {t("Rate Your Trip")}
@@ -115,7 +113,7 @@ import {
           rows={4}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          sx={{ mb: 3, bgcolor: colors.primary[100] }}
+          sx={{ mb: 3, bgcolor: colors.primary[400] }}
         />
   
         {/* Nút Submit */}

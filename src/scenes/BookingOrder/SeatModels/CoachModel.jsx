@@ -1,17 +1,25 @@
 import SquareIcon from "@mui/icons-material/Square";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import React, { memo, useCallback, useMemo, useState , useEffect} from "react";
+import React, {
+  memo,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useContext,
+} from "react";
 import Bed_Limousine_Seat_Data from "../SeatModels/Bed_Limousine_Seat_Data";
 import SeatModel from "../SeatModels/SeatModel";
 import * as bookingApi from "../../../queries/booking/ticketQueries";
 import { tokens } from "../../../theme";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { ColorModeContext } from "../../../theme";
 
 const MAX_SEAT_SELECT = 5;
 
-//lấy giá cuối cùng của chuyến đi
+// Hàm lấy giá cuối cùng của chuyến đi (có áp dụng giảm giá nếu có)
 const getBookingPrice = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -21,40 +29,48 @@ const getBookingPrice = (trip) => {
 };
 
 const CoachModel = (props) => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const colorMode = useContext(ColorModeContext);
   const { field, setActiveStep, bookingData, setBookingData } = props;
-  const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
-    field;
-  const [seatData, setSeatData] = useState(Bed_Limousine_Seat_Data);
+  const { values, setFieldValue } = field;
   const [selectedSeats, setSelectedSeats] = useState(bookingData.seatNumber);
   const [numberOfSelectedSeats, setNumberOfSelectedSeats] = useState(
     bookingData.seatNumber.length
   );
   const coachType = bookingData.trip.coach.coachType;
+  const capacity = bookingData.trip.coach.capacity; // Sức chứa động của xe
   const price = getBookingPrice(bookingData.trip);
-  const {t} = useTranslation();
-  const navigate = useNavigate(); 
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
- // Thêm bộ đếm giờ
- const [timeLeft, setTimeLeft] = useState(600); 
+  // Thêm bộ đếm giờ
+  const [timeLeft, setTimeLeft] = useState(600);
 
- useEffect(() => {
-   const timerId = setInterval(() => {
-     setTimeLeft((prev) => prev - 1);
-   }, 1000);
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
 
-   if (timeLeft === 0) {
-     clearInterval(timerId);
-     releaseSeats({ seatNumber: selectedSeats, trip: bookingData.trip });
-     alert('Thời gian giữ ghế đã hết. Quay lại chọn chuyến đi.');
-     navigate('/choose-trip');
-   }
+    if (timeLeft === 0) {
+      clearInterval(timerId);
+      releaseSeats({ seatNumber: selectedSeats, trip: bookingData.trip });
+      alert("Thời gian giữ ghế đã hết. Quay lại chọn chuyến đi.");
+      navigate("/choose-trip");
+    }
 
-   return () => clearInterval(timerId);
+    return () => clearInterval(timerId);
   }, [timeLeft, selectedSeats, bookingData.trip, navigate]);
 
+  // Lấy dữ liệu ghế ngồi động từ Bed_Limousine_Seat_Data theo loại xe và sức chứa
+  const seatData = useMemo(() => {
+    if (Bed_Limousine_Seat_Data[coachType]) {
+      return Bed_Limousine_Seat_Data[coachType](capacity);
+    }
+    return {};
+  }, [coachType, capacity]);
 
-  // lấy thông tin ghế đã đặt
+  // Lấy thông tin ghế đã đặt
   const seatBookingQuery = useQuery({
     queryKey: ["bookings", bookingData.trip.id, bookingData.bookingDateTime],
     queryFn: () =>
@@ -64,7 +80,7 @@ const CoachModel = (props) => {
       ),
   });
 
-  //lưu ghế đặt vào danh sách ghế đã đặt
+  // Lưu ghế đã đặt vào danh sách ghế đã đặt
   const handleSeatOrdered = (orderedBookings) => {
     const orderedSeats = [];
     if (orderedBookings?.length === 0) return orderedSeats;
@@ -73,16 +89,14 @@ const CoachModel = (props) => {
     });
     return orderedSeats;
   };
+
   const orderedSeats = handleSeatOrdered(seatBookingQuery?.data ?? []);
 
-  //Cập nhật trạng thái khi một ghế được chọn hoặc bỏ chọn và cập nhật số lượng ghế đã chọn và tổng tiền.
+  // Cập nhật trạng thái khi ghế được chọn hoặc bỏ chọn
   const handleSeatChoose = useCallback(
     (seatNumber, STAIR, isSelected, isOrdered) => {
-      // if chosen seat is ordered then do nothing
-      if (isOrdered) return;
-
-      // max seat select
-      if (isSelected && numberOfSelectedSeats === MAX_SEAT_SELECT) return;
+      if (isOrdered) return; // Nếu ghế đã đặt thì không thể chọn
+      if (isSelected && numberOfSelectedSeats === MAX_SEAT_SELECT) return; // Giới hạn số ghế
 
       let newSelectedSeats = [...selectedSeats];
 
@@ -98,7 +112,7 @@ const CoachModel = (props) => {
         setNumberOfSelectedSeats(numberOfSelectedSeats - 1);
       }
 
-      // mapping and update state
+      // Cập nhật trạng thái ghế trong seatData
       const newValues = {
         ...seatData,
         [STAIR]: {
@@ -109,11 +123,11 @@ const CoachModel = (props) => {
           },
         },
       };
-      setSeatData(newValues);
+
       setFieldValue("seatNumber", newSelectedSeats);
       setFieldValue("totalPayment", newSelectedSeats.length * price);
     },
-    [seatData]
+    [seatData, selectedSeats, numberOfSelectedSeats, setFieldValue, price]
   );
 
   const memoizedHandleSeatChoose = useMemo(
@@ -134,12 +148,12 @@ const CoachModel = (props) => {
       display="grid"
       gridTemplateColumns="repeat(12, 1fr)"
       gap="10px"
-      height="400px"
-      bgcolor={colors.primary[100]}
+      height="420px"
+      bgcolor={colors.primary[400]}
       borderRadius="10px"
+
     >
-    
-      {/* render seat tip */}
+      {/* Render tip trạng thái ghế */}
       <Box
         gridColumn="span 3"
         mt="30px"
@@ -183,7 +197,7 @@ const CoachModel = (props) => {
         </Box>
       </Box>
 
-      {/* Render seats */}
+      {/* Render ghế ngồi */}
       <Box
         gridColumn="span 6"
         display="flex"
@@ -195,26 +209,23 @@ const CoachModel = (props) => {
           <Box
             key={index}
             display="grid"
-            // gap="4px"
             gridTemplateColumns="repeat(3, minmax(0, 1fr))"
           >
-            {Object.entries(seatData[stair]).map((values) => {
-              return (
-                <SeatModel
-                  key={values[0]}
-                  handleSeatChoose={memoizedHandleSeatChoose}
-                  seat={values[1]}
-                  selectedSeats={selectedSeats}
-                  orderedSeats={orderedSeats}
-                  coachType={coachType}
-                />
-              );
-            })}
+            {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
+              <SeatModel
+                key={seatNumber}
+                handleSeatChoose={memoizedHandleSeatChoose}
+                seat={seat}
+                selectedSeats={selectedSeats}
+                orderedSeats={orderedSeats}
+                coachType={coachType}
+              />
+            ))}
           </Box>
         ))}
       </Box>
 
-      {/* Render additional information */}
+      {/* Render thông tin bổ sung */}
       <Box
         gridColumn="span 3"
         gap="30px"
@@ -223,27 +234,25 @@ const CoachModel = (props) => {
         alignItems="center"
         flexDirection="column"
       >
-      {/* Render bộ đếm giờ */}
-      <Box
-        gridColumn="span 12"
-        textAlign="center"
-        mb="20px"
-      >
-        <Typography variant="h6" color="error">
-          {`Thời gian giữ ghế còn lại: ${Math.floor(timeLeft / 60)}:${timeLeft % 60} phút`}
-        </Typography>
-      </Box>
-      <Box>
-        <Typography variant="h5">
-          <span style={{ fontWeight: "bold" }}>
-            {t("Đã chọn")}: {numberOfSelectedSeats} / {MAX_SEAT_SELECT} {t("chỗ")}
-          </span>
-        </Typography>
-        <Typography variant="h5">
-          <span style={{ fontWeight: "bold" }}>
-            {t("Tổng tiền")}: {formatCurrency(price * numberOfSelectedSeats)}
-          </span>
-        </Typography>
+        <Box gridColumn="span 12" textAlign="center" mb="20px">
+          <Typography variant="h6" color="error">
+            {`Thời gian giữ ghế còn lại: ${Math.floor(timeLeft / 60)}:${
+              timeLeft % 60
+            } phút`}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="h5">
+            <span style={{ fontWeight: "bold" }}>
+              {t("Đã chọn")}: {numberOfSelectedSeats} / {MAX_SEAT_SELECT}{" "}
+              {t("chỗ")}
+            </span>
+          </Typography>
+          <Typography variant="h5">
+            <span style={{ fontWeight: "bold" }}>
+              {t("Tổng tiền")}: {formatCurrency(price * numberOfSelectedSeats)}
+            </span>
+          </Typography>
         </Box>
       </Box>
     </Box>
