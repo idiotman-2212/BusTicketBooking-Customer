@@ -8,10 +8,10 @@ import {
   Modal,
   TextField,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { compareAsc, format, isAfter, parse,parseISO } from "date-fns";
+import { compareAsc, format, isAfter, parse, parseISO } from "date-fns";
 import { debounce } from "lodash";
 import React, { useEffect, useState, useContext } from "react";
 import * as bookingApi from "../../queries/booking/ticketQueries";
@@ -52,7 +52,7 @@ const MyTicket = () => {
   const [selectedTicket, setSelectedTicket] = useState(-1);
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const bookingSearchQuery = useQuery({
     queryKey: ["bookings", "all", "user", loggedInUsername],
@@ -68,13 +68,13 @@ const MyTicket = () => {
 
   const sortTickets = (ticketList) => {
     if (!ticketList?.length) return [];
-  
+
     const compareByDepartureDateTimeAsc = (a, b) => {
       const aDateTime = parseISO(a.trip.departureDateTime); // Chuyển chuỗi thành Date
       const bDateTime = parseISO(b.trip.departureDateTime);
       return compareAsc(aDateTime, bDateTime);
     };
-  
+
     return [...ticketList].sort(compareByDepartureDateTimeAsc);
   };
 
@@ -86,6 +86,8 @@ const MyTicket = () => {
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
         return { title: t("Đã hủy vé"), color: "error" };
+      case "REFUNDED":
+        return { title: t("Đã hoàn tiền"), color: "info" };
     }
   };
 
@@ -98,6 +100,8 @@ const MyTicket = () => {
         return t("Đã thanh toán");
       case "CANCEL":
         return t("Đã hủy vé");
+      case "REFUNDED":
+        return t("Đã hoàn tiền");
     }
   };
 
@@ -168,18 +172,24 @@ const MyTicket = () => {
                     >
                       <Box>
                         <Typography component="span" variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Tuyến")}:{" "}
+                          </span>
                           {`${trip.source.name}
                            ${`\u21D2`}
                          ${trip.destination.name}`}
                         </Typography>
                         <Typography variant="h6">
                           {" "}
-                          <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Xe")}:{" "}
+                          </span>
                           {trip.coach.coachType}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Ngày đi")}: </span>{" "}
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Ngày đi")}:{" "}
+                          </span>{" "}
                           {format(
                             parse(
                               trip.departureDateTime,
@@ -190,7 +200,9 @@ const MyTicket = () => {
                           )}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Ghế")}:{" "}
+                          </span>
                           {seatNumber}
                         </Typography>
                       </Box>
@@ -238,7 +250,7 @@ const MyTicket = () => {
       <Modal
         sx={{
           "& .MuiBox-root": {
-            bgcolor: colors.primary[100],
+            bgcolor: colors.primary[400],
           },
         }}
         open={openModal}
@@ -282,7 +294,9 @@ const MyTicket = () => {
                     {`${bookingDetailQuery.data.trip.coach.name} ${bookingDetailQuery.data.trip.coach.coachType}`}
                   </Typography>
                   <Typography variant="h6">
-                    <span style={{ fontWeight: "bold" }}>{t("Ngày giờ đi")}: </span>{" "}
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Ngày giờ đi")}:{" "}
+                    </span>{" "}
                     {format(
                       parse(
                         bookingDetailQuery.data.trip.departureDateTime,
@@ -415,18 +429,20 @@ const MyTicket = () => {
                     }}
                   />
                   <TextField
-                    color="warning"
+                    color={
+                      getPaymentStatusObject(
+                        bookingDetailQuery.data.paymentStatus
+                      )?.color
+                    }
                     size="small"
                     fullWidth
                     variant="outlined"
                     type="text"
                     label={t("Trạng thái thanh toán")}
                     value={
-                      bookingDetailQuery.data.paymentStatus === "UNPAID"
-                        ? "Chưa thanh toán"
-                        : bookingDetailQuery.data.paymentStatus === "PAID"
-                        ? "Đã thanh toán"
-                        : " Đã hủy vé"
+                      getPaymentStatusObject(
+                        bookingDetailQuery.data.paymentStatus
+                      )?.title
                     }
                     name="paymentStatus"
                     InputProps={{
@@ -436,6 +452,7 @@ const MyTicket = () => {
                       gridColumn: "span 2",
                     }}
                   />
+
                   <TextField
                     color="warning"
                     size="small"

@@ -56,7 +56,7 @@ const CoachModel = (props) => {
       clearInterval(timerId);
       releaseSeats({ seatNumber: selectedSeats, trip: bookingData.trip });
       alert("Thời gian giữ ghế đã hết. Quay lại chọn chuyến đi.");
-      navigate("/choose-trip");
+      navigate("/booking");
     }
 
     return () => clearInterval(timerId);

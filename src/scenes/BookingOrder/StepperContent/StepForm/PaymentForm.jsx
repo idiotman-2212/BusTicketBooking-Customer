@@ -40,6 +40,7 @@ import * as loyaltyApi from "../../../../queries/loyalty/loyaltyQueries";
 import * as cargoApi from "../../../../queries/cargo/cargoQueries";
 import { ColorModeContext, tokens } from "../../../../theme";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -81,9 +82,10 @@ const PaymentForm = ({
   const [originalTotalPayment, setOriginalTotalPayment] =
     useState(totalPayment);
   const [selectedServices, setSelectedServices] = useState({});
-
   const isLoggedIn = true; // Replace with your actual login check
   const loggedInUsername = localStorage.getItem("loggedInUsername");
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
+  const navigate = useNavigate();
 
   const { data: cargos, isLoading } = useQuery(
     ["cargos"],
@@ -241,6 +243,28 @@ const PaymentForm = ({
       resetToInitialState();
     }
   }, [pointsToUse]);
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    if (timeLeft === 0) {
+      clearInterval(timerId);
+      alert("Thời gian thanh toán đã hết. Quay lại bước đặt vé.");
+      setActiveStep(0); // Go back to the booking step
+      navigate("/booking"); // Redirect to the trip selection page
+    }
+
+    return () => clearInterval(timerId);
+  }, [timeLeft, setActiveStep, navigate]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -471,6 +495,11 @@ const PaymentForm = ({
         <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
           {t("Tổng tiền cần thanh toán")}: {formatCurrency(finalTotalPayment)}
         </Typography>
+
+        {/* Countdown Timer Display */}
+        <Typography variant="h6" color="error" sx={{ mt: 2, mb: 2 }}>
+            {t("Thời gian còn lại để thanh toán")}: {formatTime(timeLeft)}
+          </Typography>
 
         <FormControl component="fieldset" sx={{ mt: 2 }}>
           <FormLabel component="legend">

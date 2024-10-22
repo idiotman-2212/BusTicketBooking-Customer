@@ -50,7 +50,7 @@ const BookingSearch = () => {
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(-1);
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   //truy vấn booking theo sđt
   const bookingSearchQuery = useQuery({
@@ -59,14 +59,14 @@ const BookingSearch = () => {
     enabled: !isInValidPhone && searchPhone !== "",
   });
 
-  //lấy chi tiết vé đặt 
+  //lấy chi tiết vé đặt
   const bookingDetailQuery = useQuery({
     queryKey: ["bookings", selectedTicket],
     queryFn: () => bookingApi.getBooking(selectedTicket),
     enabled: selectedTicket >= 0,
   });
 
-  //kiểm tra sđt có hợp lệ 
+  //kiểm tra sđt có hợp lệ
   const checkValidPhone = (phone) => {
     if (phone !== "") {
       if (!APP_CONSTANTS.PHONE_REGEX.test(phone)) {
@@ -84,7 +84,7 @@ const BookingSearch = () => {
     checkValidPhoneDebounced(phone);
   };
 
-  //lọc và sắp xếp vé theo thời gian 
+  //lọc và sắp xếp vé theo thời gian
   const filterTickets = (ticketList) => {
     if (ticketList?.length === 0) return ticketList;
 
@@ -118,6 +118,8 @@ const BookingSearch = () => {
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
         return { title: t("Đã hủy vé"), color: "error" };
+      case "REFUNDED":
+        return { title: t("Đã hoàn tiền"), color: "info" };
     }
   };
 
@@ -130,6 +132,8 @@ const BookingSearch = () => {
         return t("Đã thanh toán");
       case "CANCEL":
         return t("Đã hủy vé");
+      case "REFUNDED":
+        return t("Đã hoàn tiền");
     }
   };
 
@@ -217,18 +221,24 @@ const BookingSearch = () => {
                     >
                       <Box>
                         <Typography component="span" variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Tuyến")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Tuyến")}:{" "}
+                          </span>
                           {`${trip.source.name}
                            ${`\u21D2`}
                          ${trip.destination.name}`}
                         </Typography>
                         <Typography variant="h6">
                           {" "}
-                          <span style={{ fontWeight: "bold" }}>{t("Xe")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Xe")}:{" "}
+                          </span>
                           {trip.coach.coachType}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Ngày đi")}: </span>{" "}
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Ngày đi")}:{" "}
+                          </span>{" "}
                           {format(
                             parse(
                               trip.departureDateTime,
@@ -239,7 +249,9 @@ const BookingSearch = () => {
                           )}
                         </Typography>
                         <Typography variant="h6">
-                          <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {t("Ghế")}:{" "}
+                          </span>
                           {seatNumber}
                         </Typography>
                       </Box>
@@ -462,18 +474,20 @@ const BookingSearch = () => {
                     }}
                   />
                   <TextField
-                    color="warning"
+                    color={
+                      getPaymentStatusObject(
+                        bookingDetailQuery.data.paymentStatus
+                      )?.color
+                    }
                     size="small"
                     fullWidth
                     variant="outlined"
                     type="text"
                     label={t("Trạng thái thanh toán")}
                     value={
-                      bookingDetailQuery.data.paymentStatus === "UNPAID"
-                        ? "Chưa thanh toán"
-                        : bookingDetailQuery.data.paymentStatus === "PAID"
-                        ? "Đã thanh toán"
-                        : " Đã hủy vé"
+                      getPaymentStatusObject(
+                        bookingDetailQuery.data.paymentStatus
+                      )?.title
                     }
                     name="paymentStatus"
                     InputProps={{
@@ -483,6 +497,7 @@ const BookingSearch = () => {
                       gridColumn: "span 2",
                     }}
                   />
+
                   <TextField
                     color="warning"
                     size="small"
