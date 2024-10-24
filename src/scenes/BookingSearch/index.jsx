@@ -143,6 +143,15 @@ const BookingSearch = () => {
     setFilteredTickets(newTickets);
   }, [bookingSearchQuery.data, searchPhone]);
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
+  };
+  
   return (
     <Box mt="100px" display="flex" flexDirection="column" gap="20px">
       <Box
@@ -441,8 +450,24 @@ const BookingSearch = () => {
                     variant="outlined"
                     type="text"
                     label={t("Địa chỉ đón")}
-                    value={bookingDetailQuery.data.pickUpAddress}
-                    name="pickUpAddress"
+                    value={formatLocation(bookingDetailQuery.data.trip.pickUpLocation)}
+                    name="pickUpLocation"
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    sx={{
+                      gridColumn: "span 4",
+                    }}
+                  />
+                  <TextField
+                    color="warning"
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    label={t("Địa chỉ trả")}
+                    value={formatLocation(bookingDetailQuery.data.trip.dropOffLocation)}
+                    name="dropOffLocation"
                     InputProps={{
                       readOnly: true,
                     }}

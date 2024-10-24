@@ -29,10 +29,17 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import EventSeatIcon from "@mui/icons-material/EventSeat";
 import PaymentIcon from "@mui/icons-material/Payment";
 import StarsIcon from "@mui/icons-material/Stars";
+import RouteIcon from "@mui/icons-material/Route";
+import RoomIcon from "@mui/icons-material/Room";
+import PinDropIcon from "@mui/icons-material/PinDrop";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import CommuteIcon from "@mui/icons-material/Commute";
+import PlaceIcon from "@mui/icons-material/Place";
+import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
+
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import * as userApi from "../../../../queries/user/userQueries";
@@ -262,9 +269,17 @@ const PaymentForm = ({
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -277,18 +292,30 @@ const PaymentForm = ({
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body1" gutterBottom>
-                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <RouteIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Tuyến")}:</strong>{" "}
                   {`${trip?.source?.name ?? ""} ${
                     bookingData.bookingType === "ONEWAY" ? `→` : `↔`
                   } ${trip?.destination?.name ?? ""}`}
                 </Typography>
+                {/* Thêm thông tin điểm đón và trả */}
+                <Typography variant="body1" gutterBottom>
+                  <RoomIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>{t("Điểm đón")}:</strong>{" "}
+                  {formatLocation(trip.pickUpLocation)}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <PinDropIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>{t("Điểm trả")}:</strong>{" "}
+                  {formatLocation(trip.dropOffLocation)}
+                </Typography>
+
                 <Typography variant="body1" gutterBottom>
                   <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Xe")}:</strong> {trip?.coach?.name ?? ""}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <CommuteIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                   <strong>{t("Loại")}:</strong> {trip?.coach?.coachType ?? ""}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
@@ -382,12 +409,25 @@ const PaymentForm = ({
                   fullWidth
                   label={t("Địa chỉ đón")}
                   variant="outlined"
-                  name="pickUpAddress"
-                  value={values.pickUpAddress}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.pickUpAddress && Boolean(errors.pickUpAddress)}
-                  helperText={touched.pickUpAddress && errors.pickUpAddress}
+                  name="pickUpLocation"
+                  value={formatLocation(trip.pickUpLocation)}
+                  error={
+                    touched.pickUpLocation && Boolean(errors.pickUpLocation)
+                  }
+                  helperText={touched.pickUpLocation && errors.pickUpLocation}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={t("Địa chỉ trả")}
+                  variant="outlined"
+                  name="dropOffLocation"
+                  value={formatLocation(trip.dropOffLocation)}
+                  error={
+                    touched.dropOffLocation && Boolean(errors.dropOffLocation)
+                  }
+                  helperText={touched.dropOffLocation && errors.dropOffLocation}
                 />
               </Grid>
             </Grid>
@@ -498,8 +538,8 @@ const PaymentForm = ({
 
         {/* Countdown Timer Display */}
         <Typography variant="h6" color="error" sx={{ mt: 2, mb: 2 }}>
-            {t("Thời gian còn lại để thanh toán")}: {formatTime(timeLeft)}
-          </Typography>
+          {t("Thời gian còn lại để thanh toán")}: {formatTime(timeLeft)}
+        </Typography>
 
         <FormControl component="fieldset" sx={{ mt: 2 }}>
           <FormLabel component="legend">
@@ -568,7 +608,7 @@ const PaymentForm = ({
             sx={{
               p: 2,
               backgroundColor: theme.palette.background.default,
-              color: theme.palette.text.primary, 
+              color: theme.palette.text.primary,
               boxShadow: theme.shadows[2],
             }}
           >

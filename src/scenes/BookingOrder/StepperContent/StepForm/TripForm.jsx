@@ -4,6 +4,13 @@ import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import DoNotDisturbAltOutlinedIcon from "@mui/icons-material/DoNotDisturbAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import RouteIcon from "@mui/icons-material/Route";
+import RoomIcon from "@mui/icons-material/Room";
+import PinDropIcon from "@mui/icons-material/PinDrop";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import CommuteIcon from "@mui/icons-material/Commute";
+import PlaceIcon from "@mui/icons-material/Place";
+import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import {
   LoadingButton,
   Timeline,
@@ -43,7 +50,6 @@ import { tokens } from "../../../../theme";
 import debounce from "lodash.debounce";
 import { useTranslation } from "react-i18next";
 
-
 const getBookingPriceString = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -70,7 +76,7 @@ const MIN_PRICE_DISTANCE = 10_000;
 const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [findClicked, setFindClicked] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(-1);
@@ -186,7 +192,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }
   };
 
-  //lọc giờ đi 
+  //lọc giờ đi
   const filterTrips = (originalTrips) => {
     let filteredTrips = [];
 
@@ -260,57 +266,17 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     setTripList(newFilteredTrips);
   }, [priceFilter, selectedDepartureTimeBox]);
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district} = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }`;
+  };
+
   return (
     <>
-      {/* BOOKING TYPE */}
-      {/* <Box display="flex">
-        <FormControl
-          sx={{
-            marginLeft: "auto",
-          }}
-        >
-          <RadioGroup
-            row
-            // aria-labelledby="bookingType"
-            name="row-radio-buttons-group"
-            value={values.bookingType}
-            onChange={(e) => {
-              setFieldValue("bookingType", e.currentTarget.value);
-            }}
-          >
-            <FormControlLabel
-              value="ONEWAY"
-              label="One way"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    color: "#00a0bd",
-                    "&.Mui-checked": {
-                      color: "#00a0bd",
-                    },
-                  }}
-                />
-              }
-            />
-            <FormControlLabel
-              value="ROUNDTRIP"
-              label="Round trip"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    color: "#00a0bd",
-                    "&.Mui-checked": {
-                      color: "#00a0bd",
-                    },
-                  }}
-                />
-              }
-            />
-          </RadioGroup>
-        </FormControl>
-      </Box> */}
       <Box
         mt="20px"
         p="20px"
@@ -522,59 +488,6 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           >
             {t("Tìm")}
           </LoadingButton>
-
-          {/* return time */}
-          {/* <FormControl
-            fullWidth
-            sx={{
-              gridColumn: "span 2",
-            }}
-          >
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                disabled={values.bookingType === "ONEWAY"}
-                format="dd/MM/yyyy"
-                label="Return Date"
-                minDate={parse(
-                  values.bookingDateTime,
-                  "yyyy-MM-dd HH:mm",
-                  new Date()
-                )}
-                value={parse(
-                  values.bookingDateTime,
-                  "yyyy-MM-dd HH:mm",
-                  new Date()
-                )}
-                onChange={(newDate) => {
-                  setFieldValue(
-                    "bookingDateTime",
-                    format(newDate, "yyyy-MM-dd HH:mm")
-                  );
-                }}
-                slotProps={{
-                  textField: {
-                    InputProps: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <CalendarMonthIcon />
-                        </InputAdornment>
-                      ),
-                    },
-                    size: "small",
-                    color: "warning",
-                    error: !!touched.dob && !!errors.dob,
-                  },
-                  dialog: {
-                    sx: {
-                      "& .MuiButton-root": {
-                        color: colors.grey[100],
-                      },
-                    },
-                  },
-                }}
-              />
-            </LocalizationProvider>
-          </FormControl> */}
         </Box>
       </Box>
 
@@ -776,10 +689,19 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           )}
                         </Typography>
                         <Typography mt="5px" variant="h6">
-                          {t("Thời lượng di chuyển")}:{" "}
+                          <strong>{t("Thời lượng di chuyển")}:</strong>{" "}
                           {trip.duration
                             ? trip.duration + t(" tiếng")
                             : t("Chưa xác định")}
+                        </Typography>
+                        {/* Thêm thông tin điểm đón và trả */}
+                        <Typography mt="5px" variant="h6">
+                          <strong>{t("Điểm đón")}:</strong>{" "}
+                          {trip.pickUpLocation?.address ?? t("Chưa xác định")}
+                        </Typography>
+                        <Typography mt="5px" variant="h6">
+                          <strong>{t("Điểm trả")}:</strong>{" "}
+                          {trip.dropOffLocation?.address ?? t("Chưa xác định")}
                         </Typography>
                         <Box
                           display="flex"
@@ -815,29 +737,40 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                       </CardContent>
                     </Box>
 
-                    <Timeline position="left">
+                    <Timeline position="right">
                       <TimelineItem>
                         <TimelineSeparator>
-                          <TimelineDot></TimelineDot>
+                          <TimelineDot />
                           <TimelineConnector />
                         </TimelineSeparator>
-                        <TimelineContent>{trip.source.name}</TimelineContent>
+                        <TimelineContent>
+                          <Typography variant="body1" fontWeight="bold">
+                            {trip.source.name}
+                          </Typography>
+                          <Typography variant="body2" color={colors.grey[300]}>
+                          {formatLocation(trip.pickUpLocation)}
+                          </Typography>
+                        </TimelineContent>
                       </TimelineItem>
                       <TimelineItem>
                         <TimelineSeparator>
-                          <TimelineDot></TimelineDot>
+                          <TimelineDot />
                         </TimelineSeparator>
                         <TimelineContent>
-                          {trip.destination.name}
+                          <Typography variant="body1" fontWeight="bold">
+                            {trip.destination.name}
+                          </Typography>
+                          <Typography variant="body2" color={colors.grey[300]}>
+                          {formatLocation(trip.dropOffLocation)}
+                          </Typography>
                         </TimelineContent>
                       </TimelineItem>
                     </Timeline>
 
                     <Box
                       display="flex"
-                      justifyContent="center"
-                      alignItems="center"
                       flexDirection="column"
+                      alignItems="center"
                     >
                       {index === selectedItemIndex || values.trip === trip ? (
                         <CheckCircleOutlineOutlinedIcon

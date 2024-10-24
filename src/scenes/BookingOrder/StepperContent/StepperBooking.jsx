@@ -32,7 +32,6 @@ const initialValues = {
   bookingDateTime: format(new Date(), "yyyy-MM-dd HH:mm"),
   seatNumber: [], // user can choose max 5 seat, in that case: create 5 tickets
   bookingType: "ONEWAY",
-  pickUpAddress: "",
   firstName: "", // used for create user
   lastName: "", // used for create user
   phone: "", // used for create user
