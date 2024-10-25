@@ -86,7 +86,6 @@ const Report = () => {
         <Typography variant="h4" fontWeight="bold" marginBottom={2}>
           {t("Báo Cáo Điểm Xu")}
         </Typography>
-
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center">
             <CircularProgress />

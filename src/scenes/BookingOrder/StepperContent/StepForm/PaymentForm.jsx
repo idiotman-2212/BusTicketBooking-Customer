@@ -381,7 +381,7 @@ const PaymentForm = ({
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t("Điện thoại")}
+                  label={t("Số điện thoại")}
                   variant="outlined"
                   name="phone"
                   value={values.phone}
@@ -571,7 +571,7 @@ const PaymentForm = ({
                   }}
                 />
               }
-              label="Tiền mặt"
+              label={t("Tiền mặt")}
             />
             <FormControlLabel
               value="CARD"
@@ -585,7 +585,7 @@ const PaymentForm = ({
                   }}
                 />
               }
-              label="Thẻ visa"
+              label={t("Thẻ visa")}
             />
           </RadioGroup>
           {!cardPaymentSelect && (
@@ -635,7 +635,7 @@ const PaymentForm = ({
             <TextField
               fullWidth
               variant="outlined"
-              label="Tên chủ thẻ *"
+              label={t("Tên chủ thẻ *")}
               value={values.nameOnCard}
               onBlur={handleBlur}
               onChange={(e) => setFieldValue("nameOnCard", e.target.value)}
@@ -648,7 +648,7 @@ const PaymentForm = ({
             <TextField
               fullWidth
               variant="outlined"
-              label="Số thẻ *"
+              label={t("Số thẻ *")}
               value={values.cardNumber}
               onBlur={handleBlur}
               onChange={(e) => setFieldValue("cardNumber", e.target.value)}
@@ -663,7 +663,7 @@ const PaymentForm = ({
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
                     format="MM/yy"
-                    label="Ngày hết hạn"
+                    label={t("Ngày hết hạn")}
                     views={["year", "month"]}
                     openTo="month"
                     minDate={new Date()}

@@ -177,6 +177,7 @@ const StepperBooking = () => {
   return (
     <Box 
     m="0"
+    
     bgcolor={theme.palette.background.default} // Màu nền từ theme
     color={theme.palette.text.primary} // Màu chữ từ theme
     >

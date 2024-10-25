@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Fab, Menu, MenuItem, Tooltip, Box, useTheme } from "@mui/material";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import { ColorModeContext, tokens } from "../../theme";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -9,6 +10,7 @@ const Contact = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
+  const { t } = useTranslation();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -21,7 +23,7 @@ const Contact = () => {
   return (
     <Box sx={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
       {/* Nút Liên hệ (Fab) */}
-      <Tooltip title="Liên hệ">
+      <Tooltip title={t("Liên hệ")}>
         <Fab
           color="primary"
           aria-label="contact"

@@ -397,7 +397,7 @@ const LoyaltyPoint = () => {
             fontWeight="bold"
             marginBottom="20px"
           >
-            {t("Chi tiết Người Dùng")}
+            {t("Chi tiết người dùng")}
           </Typography>
           {userQuery.isLoading ? (
             <Stack spacing={1}>
@@ -477,7 +477,7 @@ const LoyaltyPoint = () => {
             fontWeight="bold"
             marginBottom="20px"
           >
-            {t("Chi tiết Chuyến Đi")}
+            {t("Chi tiết chuyến đi")}
           </Typography>
           {tripQuery.isLoading ? (
             <Stack spacing={1}>

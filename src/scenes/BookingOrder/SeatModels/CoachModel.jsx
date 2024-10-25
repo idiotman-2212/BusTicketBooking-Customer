@@ -238,7 +238,7 @@ const CoachModel = (props) => {
           <Typography variant="h6" color="error">
             {`Thời gian giữ ghế còn lại: ${Math.floor(timeLeft / 60)}:${
               timeLeft % 60
-            } phút`}
+            }`}
           </Typography>
         </Box>
         <Box>
