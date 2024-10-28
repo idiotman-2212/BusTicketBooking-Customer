@@ -442,9 +442,26 @@ const PaymentForm = ({
                 />
               }
               label={
-                <Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: "bold", // In đậm
+                    fontSize: "15px", // Tăng kích thước chữ
+                    padding: "8px", // Thêm khoảng cách
+                    borderRadius: "4px", // Bo tròn góc
+                  }}
+                >
                   {t("Tôi đã đọc và đồng ý với các quy định của nhà xe.")}{" "}
-                  <Link href="#" onClick={onOpenRegulations}>
+                  <Link 
+                  href="#" 
+                  onClick={onOpenRegulations}
+                  sx={{
+      fontWeight: "bold",            // In đậm liên kết
+      color: theme.palette.primary.main, // Đổi màu liên kết
+      textDecoration: "underline",   // Gạch chân liên kết
+    }}
+
+                  >
                     {t("Nội quy của nhà xe")}
                   </Link>
                 </Typography>

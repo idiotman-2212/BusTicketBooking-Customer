@@ -4,7 +4,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
 const Regulation = ({ open, onClose }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign:'center'}}>Nội quy và Quy định</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign:'center'}}>Nội quy và Quy định của nhà xe</DialogTitle>
       
       <DialogContent dividers>
         <Typography variant="h5" gutterBottom>
@@ -21,6 +21,9 @@ const Regulation = ({ open, onClose }) => {
         </Typography>
         <Typography variant="body1" paragraph>
           - Khách hàng có thể hủy vé trong vòng 24 giờ trước giờ khởi hành bằng cách gọi đến số điện thoại của nhân viên CSKH (0326917158) để được hỗ trợ.
+        </Typography>
+        <Typography variant="body1" paragraph>
+          - Nhà xe chỉ hỗ trợ đón và trả khách tại những điểm cố định có sẵn, quý khách vui lòng di chuyển đến những địa điểm được cung cấp sẵn để nhà xe dễ dàng vận chuyển hơn. Xin cảm ơn.
         </Typography>
 
         <Divider sx={{ my: 2 }} />

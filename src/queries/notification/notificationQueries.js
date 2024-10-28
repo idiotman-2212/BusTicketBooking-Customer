@@ -76,7 +76,7 @@ export const updateNotification = async (notificationId, message) => {
 // Xóa một thông báo
 export const deleteNotification = async (notificationId) => {
     try {
-        await http.delete(`/notifications/${notificationId}`);
+        await http.delete(`/notifications/user/${notificationId}`);
     } catch (error) {
         console.error("Error deleting notification:", error);
         throw error;

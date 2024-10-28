@@ -12,6 +12,8 @@ const Logout = () => {
     authApi.logout();
     localStorage.removeItem("accessToken");
     localStorage.removeItem("loggedInUsername");
+    localStorage.removeItem("hasReadRegulations");
+    localStorage.removeItem("loggedIn"); 
   };
 
   handleLogout();

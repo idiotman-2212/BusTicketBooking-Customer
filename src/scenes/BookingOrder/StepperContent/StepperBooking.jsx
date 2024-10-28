@@ -242,6 +242,7 @@ const StepperBooking = () => {
                     loadingPosition="start"
                     loading={isSubmitting}
                     startIcon={<SaveAsOutlinedIcon />}
+                    disabled={isLastStep && !rest.values.hasReadRegulations}
                   >
                     {!isLastStep ? t("Tiếp") : t("Đặt vé")}
                   </LoadingButton>

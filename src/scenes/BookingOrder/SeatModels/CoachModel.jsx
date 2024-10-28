@@ -148,10 +148,9 @@ const CoachModel = (props) => {
       display="grid"
       gridTemplateColumns="repeat(12, 1fr)"
       gap="10px"
-      height="420px"
+      height="450px"
       bgcolor={colors.primary[400]}
       borderRadius="10px"
-
     >
       {/* Render tip trạng thái ghế */}
       <Box
@@ -207,20 +206,34 @@ const CoachModel = (props) => {
       >
         {Object.keys(seatData).map((stair, index) => (
           <Box
-            key={index}
-            display="grid"
-            gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            key={stair}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
           >
-            {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
-              <SeatModel
-                key={seatNumber}
-                handleSeatChoose={memoizedHandleSeatChoose}
-                seat={seat}
-                selectedSeats={selectedSeats}
-                orderedSeats={orderedSeats}
-                coachType={coachType}
-              />
-            ))}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              // mb={2}
+              color={colors.greenAccent[400]}
+            >
+              {stair === "DOWN_STAIR" ? "Tầng dưới" : stair === "UP_STAIR" ? "Tầng trên" : ""}
+            </Typography>
+            <Box
+              display="grid"
+              gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            >
+              {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
+                <SeatModel
+                  key={seatNumber}
+                  handleSeatChoose={memoizedHandleSeatChoose}
+                  seat={seat}
+                  selectedSeats={selectedSeats}
+                  orderedSeats={orderedSeats}
+                  coachType={coachType}
+                />
+              ))}
+            </Box>
           </Box>
         ))}
       </Box>
