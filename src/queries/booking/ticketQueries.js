@@ -54,6 +54,11 @@ const getBooking = async (bookingId) => {
     return resp.data
 }
 
+const getBookingWithCargos = async (bookingId) => {
+    const resp = await http.get(`/bookings/cargos/${bookingId}`)
+    return resp.data
+}
+
 const getAvailableBooking = async () => {
     const resp = await http.get(`/bookings/${bookingId}`)
     return resp.data
@@ -77,6 +82,6 @@ const deleteBooking = async (bookingId) => {
 
 export {
     createNewBookings, deleteBooking, getAll, getAllByPhone, getAllByUsername,
-    getPageOfBookings, getSeatBooking, getBooking, updateBooking, getAvailableBooking
+    getPageOfBookings, getSeatBooking, getBooking, updateBooking, getAvailableBooking,getBookingWithCargos
 };
 

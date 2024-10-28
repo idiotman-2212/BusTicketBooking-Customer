@@ -325,6 +325,57 @@ const MyTicket = () => {
                     <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                     {bookingDetailQuery.data.seatNumber}
                   </Typography>
+                {/* Thông tin dịch vụ gửi hàng đi kèm */}
+                {bookingDetailQuery?.data?.bookingCargos?.length > 0 && (
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{ mt: 3 }}
+                    >
+                      <Typography variant="h5" fontWeight="bold">
+                        {t("Dịch vụ gửi hàng đi kèm")}
+                      </Typography>
+                      {bookingDetailQuery.data.bookingCargos.map(
+                        (cargoItem, index) => (
+                          <Box
+                            key={index}
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            alignItems="center"
+                            mt="10px"
+                            sx={{
+                              padding: "10px",
+                              backgroundColor: colors.primary[400],
+                              borderRadius: "8px",
+                              width: "100%",
+                            }}
+                          >
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Tên dịch vụ")}:{" "}
+                              </span>
+                              {cargoItem.cargo.name}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Số lượng")}:{" "}
+                              </span>
+                              {cargoItem.quantity}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Giá dịch vụ")}:{" "}
+                              </span>
+                              {formatCurrency(cargoItem.price)}
+                            </Typography>
+                          </Box>
+                        )
+                      )}
+                    </Box>
+                  )}
                 </Box>
                 <Box
                   display="grid"
