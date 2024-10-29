@@ -40,8 +40,8 @@ const Regulation = ({ open, onClose }) => {
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="error" onClick={onClose}>
-          Đóng
+        <Button variant="contained"   color="success" onClick={onClose}>
+          Tôi đã đọc nội quy
         </Button>
       </DialogActions>
     </Dialog>
