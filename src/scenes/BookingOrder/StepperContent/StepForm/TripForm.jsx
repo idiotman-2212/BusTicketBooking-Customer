@@ -69,6 +69,35 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
+
+const getDiscountedPriceDisplay = (trip) => {
+  const originalPrice = trip.price;
+  let finalPrice = originalPrice;
+
+  // Tính toán giá sau khi giảm
+  if (!isNaN(trip?.discount?.amount)) {
+    finalPrice -= trip.discount.amount;
+  }
+
+  // Trả về JSX để hiển thị giá gốc với gạch ngang nếu có giảm giá và giá giảm
+  return (
+    <Box display="flex" alignItems="center">
+      {originalPrice !== finalPrice && (
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          sx={{ textDecoration: 'line-through', marginRight: '8px' }}
+        >
+          {formatCurrency(originalPrice)}
+        </Typography>
+      )}
+      <Typography variant="h5" color="error">
+        {formatCurrency(finalPrice)}
+      </Typography>
+    </Box>
+  );
+};
+
 const MIN_PRICE = 0;
 const MAX_PRICE = 1_000_000;
 const MIN_PRICE_DISTANCE = 10_000;
@@ -714,7 +743,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           bgcolor={colors.primary[400]}
                         >
                           <Typography variant="h5">
-                            {getBookingPriceString(trip)}
+                            {/* {getBookingPriceString(trip)} */}
+                            {getDiscountedPriceDisplay(trip)}
                           </Typography>
                           <Typography
                             variant="h5"
