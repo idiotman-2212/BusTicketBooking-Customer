@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, useMediaQuery  } from "@mui/material";
 import { format, parse } from "date-fns";
 import React from "react";
 import CoachModel from "../../SeatModels/CoachModel";
@@ -10,6 +10,7 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const colors = tokens(theme.palette.mode);
   const { t } = useTranslation();
   const { bookingDateTime, trip } = bookingData;
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Hàm lấy giá cuối cùng sau khi áp dụng mã giảm giá (nếu có)
   const getBookingPriceString = (trip) => {
@@ -35,14 +36,17 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         mt="15px"
         textAlign="center"
         bgcolor={colors.primary[400]}
-        m="0 60px"
-        p="10px 0"
-        borderRadius="30px"
+        m={isSmallScreen ? "0 10px" : "0 60px"}
+        p="15px"
+        borderRadius="20px"
         display="flex"
+        flexDirection={isSmallScreen ? "column" : "row"}
         justifyContent="center"
         alignItems="center"
-        gap="15px"
+        gap={isSmallScreen ? "10px" : "15px"}
+        boxShadow={isSmallScreen ? "none" : "0px 4px 15px rgba(0, 128, 0, 0.2)"}
       >
+
         <Typography component="span" variant="h5">
           {`${trip.source.name} ${
             bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`

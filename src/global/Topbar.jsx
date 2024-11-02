@@ -148,7 +148,7 @@ const Topbar = () => {
       </Box>
 
       {/* Top bar Menu */}
-      <Box display="flex" gap="30px" alignItems="center">
+      <Box display="flex" gap={isMobile ? "10px" : "30px"} alignItems="center">
         <Link to="/booking">
           <Button
             variant="contained"

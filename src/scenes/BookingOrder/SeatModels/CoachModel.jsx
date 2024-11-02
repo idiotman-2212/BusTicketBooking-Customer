@@ -1,5 +1,5 @@
 import SquareIcon from "@mui/icons-material/Square";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, useMediaQuery  } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React, {
   memo,
@@ -43,6 +43,8 @@ const CoachModel = (props) => {
   const price = getBookingPrice(bookingData.trip);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   // Thêm bộ đếm giờ
   const [timeLeft, setTimeLeft] = useState(600);
@@ -146,20 +148,21 @@ const CoachModel = (props) => {
     <Box
       position="relative"
       display="grid"
-      gridTemplateColumns="repeat(12, 1fr)"
+      gridTemplateColumns={isSmallScreen ? "1fr" : "repeat(12, 1fr)"}
       gap="10px"
-      height="450px"
+      p={isSmallScreen ? "20px" : "30px"}
       bgcolor={colors.primary[400]}
       borderRadius="10px"
+      boxShadow={isSmallScreen ? "none" : "0px 4px 10px rgba(0, 0, 0, 0.1)"}
     >
       {/* Render tip trạng thái ghế */}
       <Box
-        gridColumn="span 3"
-        mt="30px"
-        gap="35px"
+        gridColumn={isSmallScreen ? "span 12" : "span 3"}
         display="flex"
         justifyContent="center"
-        flexDirection="column"
+        flexDirection={isSmallScreen ? "row" : "column"}
+        alignItems="center"
+        gap="15px"
       >
         <Box textAlign="center">
           <SquareIcon
@@ -198,11 +201,12 @@ const CoachModel = (props) => {
 
       {/* Render ghế ngồi */}
       <Box
-        gridColumn="span 6"
+        gridColumn={isSmallScreen ? "span 12" : "span 6"}
         display="flex"
+        flexDirection={isSmallScreen ? "column" : "row"}
         alignItems="center"
         justifyContent="space-evenly"
-        gap="50px"
+        gap={isSmallScreen ? "20px" : "50px"}
       >
         {Object.keys(seatData).map((stair, index) => (
           <Box
@@ -240,8 +244,8 @@ const CoachModel = (props) => {
 
       {/* Render thông tin bổ sung */}
       <Box
-        gridColumn="span 3"
-        gap="30px"
+        gridColumn={isSmallScreen ? "span 12" : "span 3"}
+        gap="20px"
         display="flex"
         justifyContent="center"
         alignItems="center"

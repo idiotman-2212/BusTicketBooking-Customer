@@ -11,6 +11,7 @@ import {
   useTheme,
   IconButton,
   Button,
+  useMediaQuery,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { compareAsc, format, isAfter, parse, parseISO } from "date-fns";
@@ -59,6 +60,7 @@ const MyTicket = () => {
   const { t } = useTranslation();
   const [openPrintModal, setOpenPrintModal] = useState(false);
   const [selectedPrintTicket, setSelectedPrintTicket] = useState(null);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const bookingSearchQuery = useQuery({
     queryKey: ["bookings", "all", "user", loggedInUsername],
@@ -133,7 +135,7 @@ const MyTicket = () => {
 
   return (
     <Box
-      mt="100px"
+      mt="120px"
       display="flex"
       flexDirection="column"
       gap="20px"
@@ -148,9 +150,9 @@ const MyTicket = () => {
         sortedTickets.length !== 0 ? (
           <Box
             display="grid"
-            gridTemplateColumns="repeat(12, 1fr)"
+            gridTemplateColumns={isMobile ? "1fr" : "repeat(12, 1fr)"}
             gap="30px"
-            p="50px"
+            p={isMobile ? "20px" : "50px"}
             bgcolor={colors.primary[400]}
             sx={{
               width: "100%",
@@ -173,9 +175,9 @@ const MyTicket = () => {
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gridColumn: "span 6",
+                    gridColumn: isMobile ? "span 12" : "span 6",
                     cursor: "pointer",
-                    padding: "0 20px",
+                    padding: isMobile ? "10px" : "0 20px",
                   }}
                 >
                   <Box
@@ -241,7 +243,7 @@ const MyTicket = () => {
         ) : (
           // no result
           <Box
-            p="100px"
+            p={isMobile ? "50px" : "100px"}
             display="flex"
             flexDirection="column"
             gap="10px"
@@ -250,16 +252,12 @@ const MyTicket = () => {
           >
             <ContentPasteSearchOutlinedIcon
               sx={{
-                width: "150px",
-                height: "150px",
-                color: colors.primary[400],
+                width: isMobile ? "100px" : "150px",
+                height: isMobile ? "100px" : "150px",
+                color: colors.primary[500],
               }}
             />
-            <Typography
-              color={colors.primary[400]}
-              variant="h2"
-              fontWeight="bold"
-            >
+            <Typography color={colors.primary[500]} variant={isMobile ? "h4" : "h2"} fontWeight="bold">
               {t("Không có kết quả")}
             </Typography>
           </Box>
@@ -286,7 +284,8 @@ const MyTicket = () => {
             transform: "translate(-50%, -50%)",
             borderRadius: "10px",
             boxShadow: 24,
-            p: 4,
+            p: isMobile ? 2 : 4, // Adjusted padding for mobile
+            width: isMobile ? "90vw" : "auto", // Full-width modal on mobile
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

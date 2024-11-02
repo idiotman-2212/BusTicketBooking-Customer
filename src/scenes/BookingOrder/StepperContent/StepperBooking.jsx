@@ -1,6 +1,6 @@
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
@@ -104,6 +104,7 @@ const StepperBooking = () => {
   const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
   const [showRegulations, setShowRegulations] = useState(false);
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
 
   const handleOpenRegulations = () => {
@@ -177,14 +178,14 @@ const StepperBooking = () => {
   return (
     <Box 
     m="0"
-    
+    p={isSmallScreen ? "10px" : "20px"}
     bgcolor={theme.palette.background.default} // Màu nền từ theme
     color={theme.palette.text.primary} // Màu chữ từ theme
     >
       {/* <Header title={undefined} subTitle={"CREATE BOOKING"} /> */}
 
       <Box mt="100px">
-        <Stepper activeStep={activeStep}>
+      <Stepper activeStep={activeStep} orientation={isSmallScreen ? "vertical" : "horizontal"}>
           {steps.map((label, index) => (
             <Step key={index}>
               <StepLabel>{label}</StepLabel>
@@ -210,7 +211,7 @@ const StepperBooking = () => {
           >
             {({ isSubmitting, handleSubmit, ...rest }) => (
               <form onSubmit={handleSubmit}>
-                <Box m="20px 0">
+              <Box m={isSmallScreen ? "10px 0" : "20px 0"}>
                   {renderStepContent(
                     activeStep,
                     rest,
@@ -220,7 +221,7 @@ const StepperBooking = () => {
                     handleOpenRegulations 
                   )}
                 </Box>
-                <Box mt="20px" display="flex" justifyContent="center">
+                <Box mt="20px" display="flex" flexDirection={isSmallScreen ? "column" : "row"} justifyContent="center">
                   {activeStep !== 0 && (
                     <Button
                       disableElevation
@@ -228,6 +229,7 @@ const StepperBooking = () => {
                       color="success"
                       variant="contained"
                       onClick={handleBack}
+                      sx={{ mb: isSmallScreen ? "10px" : "0" }}
                     >
                       {t("Quay lại")}
                     </Button>
@@ -235,7 +237,7 @@ const StepperBooking = () => {
                   <LoadingButton
                     disableElevation
                     disableRipple
-                    sx={{ marginLeft: "auto" }}
+                    sx={{ marginLeft: isSmallScreen ? "0" : "auto", width: isSmallScreen ? "100%" : "auto" }}
                     color="success"
                     type="submit"
                     variant="contained"

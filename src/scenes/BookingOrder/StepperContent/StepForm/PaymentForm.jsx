@@ -23,6 +23,7 @@ import {
   useTheme,
   Checkbox,
   Link,
+  useMediaQuery
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -93,6 +94,7 @@ const PaymentForm = ({
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
   const navigate = useNavigate();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { data: cargos, isLoading } = useQuery(
     ["cargos"],
@@ -283,7 +285,7 @@ const PaymentForm = ({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box elevation={3} sx={{ p: 4, mt: 4 }}>
+      <Box sx={{ p: 4, mt: 4 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={5}>
             <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -404,7 +406,7 @@ const PaymentForm = ({
                   helperText={touched.email && errors.email}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label={t("Địa chỉ đón")}
@@ -417,7 +419,7 @@ const PaymentForm = ({
                   helperText={touched.pickUpLocation && errors.pickUpLocation}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   label={t("Địa chỉ trả")}
@@ -442,15 +444,7 @@ const PaymentForm = ({
                 />
               }
               label={
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontWeight: "bold", // In đậm
-                    fontSize: "15px", // Tăng kích thước chữ
-                    padding: "8px", // Thêm khoảng cách
-                    borderRadius: "4px", // Bo tròn góc
-                  }}
-                >
+                <Typography variant="body1" sx={{ fontWeight: "bold", fontSize: "15px", padding: "8px" }}>
                   {t("Tôi đã đọc và đồng ý với các quy định của nhà xe.")}{" "}
                   <Link
                     href="#"

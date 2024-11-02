@@ -8,6 +8,8 @@ import {
   Modal,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { compareAsc, format, isAfter, parse } from "date-fns";
@@ -44,7 +46,9 @@ const formatCurrency = (amount) => {
 };
 
 const BookingSearch = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
   const [openModal, setOpenModal] = useState(false);
   const [searchPhone, setSearchPhone] = useState("");
   const [isInValidPhone, setIsInValidPhone] = useState(false);
@@ -160,7 +164,7 @@ const BookingSearch = () => {
         display="flex"
         justifyContent="center"
         borderRadius="6px"
-        p="30px 200px"
+        p={isMobile ? "20px" : "30px 200px"}
         gap="30px"
       >
         <TextField
@@ -174,12 +178,12 @@ const BookingSearch = () => {
           helperText={isInValidPhone && messages.phone.invalid}
           InputProps={{
             style: {
-              fontSize: "1.5rem",
+              fontSize: isMobile ? "1.2rem" : "1.5rem",
             },
           }}
           InputLabelProps={{
             style: {
-              fontSize: "1.2rem",
+              fontSize: isMobile ? "1rem" : "1.2rem",
             },
           }}
         />
@@ -188,9 +192,9 @@ const BookingSearch = () => {
         filteredTickets.length !== 0 && !isInValidPhone ? (
           <Box
             display="grid"
-            gridTemplateColumns="repeat(12, 1fr)"
+            gridTemplateColumns={isMobile ? "repeat(1, 1fr)" : "repeat(12, 1fr)"}
             gap="30px"
-            p="50px"
+            p={isMobile ? "20px" : "50px"}
             sx={{
               width: "100%",
               position: "relative",
@@ -214,7 +218,8 @@ const BookingSearch = () => {
                     alignItems: "center",
                     gridColumn: "span 6",
                     cursor: "pointer",
-                    padding: "0 20px",
+                    padding: isMobile ? "10px" : "0 20px",
+                    flexDirection: isMobile ? "column" : "row",
                   }}
                 >
                   <Box
@@ -279,7 +284,7 @@ const BookingSearch = () => {
           </Box>
         ) : (
           <Box
-            p="100px"
+            p={isMobile ? "50px" : "100px"}
             display="flex"
             flexDirection="column"
             gap="10px"
@@ -288,14 +293,14 @@ const BookingSearch = () => {
           >
             <ContentPasteSearchOutlinedIcon
               sx={{
-                width: "150px",
-                height: "150px",
-                color: colors.primary[400],
+                width: isMobile ? "100px" : "150px", // Adjusted icon size
+                height: isMobile ? "100px" : "150px",
+                color: colors.primary[500],
               }}
             />
             <Typography
-              color={colors.primary[400]}
-              variant="h2"
+              color={colors.primary[500]}
+              variant={isMobile ? "h4" : "h2"}
               fontWeight="bold"
             >
               {t("Không có kết quả")}
@@ -323,7 +328,8 @@ const BookingSearch = () => {
             transform: "translate(-50%, -50%)",
             borderRadius: "10px",
             boxShadow: 24,
-            p: 4,
+            p: isMobile ? 2 : 4, // Adjusted padding for smaller screens
+            width: isMobile ? "90vw" : "auto", // Full-width modal on mobile
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -335,7 +341,7 @@ const BookingSearch = () => {
           <Box display="flex" alignItems="center">
             {bookingDetailQuery?.data && (
               <>
-                <Box>
+                <Box textAlign={isMobile ? "center" : "left"} width={isMobile ? "100%" : "auto"}>
                   <Typography mb="40px" variant="h3" fontWeight="bold">
                     {t("THÔNG TIN VÉ ĐẶT")}
                   </Typography>
@@ -379,7 +385,7 @@ const BookingSearch = () => {
                       flexDirection="column"
                       alignItems="center"
                       justifyContent="center"
-                      sx={{ mt: 3 }}
+                      sx={{ mt: 3, width: isMobile ? "100%" : "auto" }}
                     >
                       <Typography variant="h5" fontWeight="bold">
                         {t("Dịch vụ gửi hàng đi kèm")}
@@ -431,7 +437,7 @@ const BookingSearch = () => {
                             seatNumber: bookingDetailQuery.data.seatNumber,
                             totalPayment: bookingDetailQuery.data.totalPayment,
                           })}
-                          size={100}
+                          size={isMobile ? 70 : 100}
                         />
                       </Box>
                     </Box>

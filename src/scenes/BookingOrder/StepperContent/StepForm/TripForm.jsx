@@ -35,6 +35,7 @@ import {
   TextField,
   Typography,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -69,7 +70,6 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-
 const getDiscountedPriceDisplay = (trip) => {
   const originalPrice = trip.price;
   let finalPrice = originalPrice;
@@ -86,7 +86,7 @@ const getDiscountedPriceDisplay = (trip) => {
         <Typography
           variant="body2"
           color="textSecondary"
-          sx={{ textDecoration: 'line-through', marginRight: '8px' }}
+          sx={{ textDecoration: "line-through", marginRight: "8px" }}
         >
           {formatCurrency(originalPrice)}
         </Typography>
@@ -125,6 +125,9 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const queryClient = useQueryClient();
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
+
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   // prepare data (province, trip, ...) for autocomplete combobox
   // lấy ds tỉnh
@@ -298,7 +301,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const formatLocation = (location) => {
     if (!location) return t("Chưa xác định");
 
-    const { address, ward, district} = location;
+    const { address, ward, district } = location;
     return `${address || ""}${ward ? ", " + ward : ""}${
       district ? ", " + district : ""
     }`;
@@ -312,7 +315,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         display="grid"
         gap="30px"
         borderRadius="4px"
-        gridTemplateColumns="repeat(12, 1fr)"
+        gridTemplateColumns={isSmallScreen ? "1fr" : "repeat(12, 1fr)"}
         bgcolor={colors.primary[400]}
       >
         {/* choose location */}
@@ -320,7 +323,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           display="flex"
           alignItems="center"
           sx={{
-            gridColumn: "span 6",
+            gridColumn: isSmallScreen ? "span 12" : "span 6",
+            flexDirection: isSmallScreen ? "column" : "row",
           }}
         >
           <Autocomplete
@@ -336,9 +340,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             getOptionLabel={(option) => option.name}
             options={provinceQuery.data ?? []}
             loading={provinceClicked && provinceQuery.isLoading}
-            sx={{
-              gridColumn: "span 2",
-            }}
+            sx={{ marginBottom: isSmallScreen ? "10px" : "0" }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -421,7 +423,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           alignItems="center"
           gap="10px"
           sx={{
-            gridColumn: "span 6",
+            gridColumn: isSmallScreen ? "span 12" : "span 6",
+            flexDirection: isSmallScreen ? "column" : "row",
           }}
         >
           {/* from date */}
@@ -522,14 +525,14 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
       <Box
         display="grid"
-        gridTemplateColumns="repeat(4, 1fr)"
+        gridTemplateColumns={isSmallScreen ? "1fr" : "repeat(4, 1fr)"}
         m="30px 0"
         gap="10px"
       >
         {/* filter */}
         <Box
           borderRadius="4px"
-          gridColumn="span 1"
+          gridColumn={isSmallScreen ? "span 4" : "span 1"}
           pb="30px"
           bgcolor={colors.primary[400]}
         >
@@ -660,7 +663,10 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         </Box>
 
         {/* trip lists */}
-        <Box borderRadius="4px" gridColumn="span 3">
+        <Box
+          borderRadius="4px"
+          gridColumn={isSmallScreen ? "span 4" : "span 3"}
+        >
           {findTripQuery.isLoading &&
           findClicked &&
           !!selectedSource &&
@@ -671,7 +677,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           ) : tripList.length !== 0 ? (
             <Box
               display="grid"
-              gridTemplateColumns="repeat(2, 1fr)"
+              gridTemplateColumns={isSmallScreen ? "1fr" : "repeat(2, 1fr)"}
               gap="20px"
               p="0 20px"
               sx={{
@@ -694,12 +700,13 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     key={index}
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "0 20px",
-                      borderRadius: "10px",
-                      gridColumn: "span 2",
+                      flexDirection: isSmallScreen ? "column" : "row",
+                      padding: "20px",
                       cursor: "pointer",
+                      alignItems: "center",
+                      gridColumn: isSmallScreen ? "span 1" : "span 2",
+                      borderRadius: "10px",
+                      backgroundColor:colors.primary[400],
                     }}
                   >
                     <Box display="flex" flexDirection="column">
@@ -740,7 +747,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           mt="20px"
                           p="6px 10px"
                           borderRadius="30px"
-                          bgcolor={colors.primary[400]}
+                          bgcolor={colors.greenAccent[400]}
                         >
                           <Typography variant="h5">
                             {/* {getBookingPriceString(trip)} */}
@@ -778,7 +785,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                             {trip.source.name}
                           </Typography>
                           <Typography variant="body2" color={colors.grey[300]}>
-                          {formatLocation(trip.pickUpLocation)}
+                            {formatLocation(trip.pickUpLocation)}
                           </Typography>
                         </TimelineContent>
                       </TimelineItem>
@@ -791,7 +798,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                             {trip.destination.name}
                           </Typography>
                           <Typography variant="body2" color={colors.grey[300]}>
-                          {formatLocation(trip.dropOffLocation)}
+                            {formatLocation(trip.dropOffLocation)}
                           </Typography>
                         </TimelineContent>
                       </TimelineItem>
