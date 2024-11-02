@@ -25,6 +25,7 @@ import {
   useTheme,
   Container,
   Button,
+  useMediaQuery,
 } from "@mui/material";
 import { getLoyaltyTransactions } from "../../queries/loyalty/loyaltyQueries";
 import { useQuery } from "@tanstack/react-query";
@@ -85,6 +86,7 @@ const LoyaltyPoint = () => {
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -161,11 +163,11 @@ const LoyaltyPoint = () => {
 
   return (
     <Box
-      p={3}
+      p={isMobile ? 2 : 3}
       bgcolor={theme.palette.background.default} // Màu nền từ theme
       color={theme.palette.text.primary} // Màu chữ từ theme
     >
-      <Paper elevation={3} sx={{ padding: 3, marginBottom: 2 }}>
+      <Paper elevation={3} sx={{ padding: isMobile ? 2 : 3, marginBottom: 2 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center"> {/* Sử dụng Flexbox */}
         <Box>
           <Typography
@@ -193,8 +195,8 @@ const LoyaltyPoint = () => {
           color="primary"
           onClick={() => navigate("/report")} // Chuyển hướng đến trang Report
           sx={{
-            padding: "10px 20px", // Điều chỉnh padding của nút
-            fontSize: "16px", // Thay đổi kích thước chữ cho nút
+            padding: isMobile ? "8px 16px" : "10px 15px",
+              fontSize: isMobile ? "14px" : "16px",
             fontWeight: "bold", // Để chữ đậm hơn
             borderRadius: "8px", // Tạo góc bo tròn cho nút
           }}
@@ -204,11 +206,7 @@ const LoyaltyPoint = () => {
       </Box>
     </Paper>
 
-      <TableContainer
-        component={Paper}
-        elevation={3}
-        sx={{ borderRadius: "12px" }}
-      >
+      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: "12px", overflowX: isMobile ? "auto" : "visible" }}>
         <Table>
           <TableHead>
             <TableRow
@@ -217,50 +215,20 @@ const LoyaltyPoint = () => {
                 color: "text.primary",
               }}
             >
-              <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.grey[100],
-                }}
-              >
+               <TableCell sx={{ fontSize: isMobile ? "0.875rem" : "1rem", fontWeight: "bold", color: colors.grey[100] }}>
                 {t("Người Dùng")}
               </TableCell>
-              <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.grey[100],
-                }}
-              >
+              <TableCell sx={{ fontSize: isMobile ? "0.875rem" : "1rem", fontWeight: "bold", color: colors.grey[100] }}>
                 {t("Số Xu")}
               </TableCell>
-              <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.grey[100],
-                }}
-              >
+              <TableCell sx={{ fontSize: isMobile ? "0.875rem" : "1rem", fontWeight: "bold", color: colors.grey[100] }}>
                 {t("Ngày Giao Dịch")}
               </TableCell>
-              <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.grey[100],
-                }}
-              >
+              <TableCell sx={{ fontSize: isMobile ? "0.875rem" : "1rem", fontWeight: "bold", color: colors.grey[100] }}>
                 {t("Loại Giao Dịch")}
               </TableCell>
 
-              <TableCell
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: colors.grey[100],
-                }}
-              >
+               <TableCell sx={{ fontSize: isMobile ? "0.875rem" : "1rem", fontWeight: "bold", color: colors.grey[100] }}>
                 {t("Chuyến Đi")}
               </TableCell>
             </TableRow>

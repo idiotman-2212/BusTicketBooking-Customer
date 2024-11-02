@@ -9,6 +9,8 @@ import {
   TextField,
   Typography,
   useTheme,
+  IconButton,
+  Button,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { compareAsc, format, isAfter, parse, parseISO } from "date-fns";
@@ -19,6 +21,8 @@ import { tokens, ColorModeContext } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
 import { useTranslation } from "react-i18next";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import { QRCodeCanvas } from "qrcode.react";
 
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
@@ -53,6 +57,8 @@ const MyTicket = () => {
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const [openPrintModal, setOpenPrintModal] = useState(false);
+  const [selectedPrintTicket, setSelectedPrintTicket] = useState(null);
 
   const bookingSearchQuery = useQuery({
     queryKey: ["bookings", "all", "user", loggedInUsername],
@@ -65,6 +71,11 @@ const MyTicket = () => {
     queryFn: () => bookingApi.getBooking(selectedTicket),
     enabled: selectedTicket >= 0,
   });
+
+  const handleOpenPrintModal = (ticketId) => {
+    setSelectedPrintTicket(ticketId);
+    setOpenPrintModal(true);
+  };
 
   const sortTickets = (ticketList) => {
     if (!ticketList?.length) return [];
@@ -119,7 +130,7 @@ const MyTicket = () => {
       district ? ", " + district : ""
     }${province?.name ? ", " + province.name : ""}`;
   };
-  
+
   return (
     <Box
       mt="100px"
@@ -325,8 +336,9 @@ const MyTicket = () => {
                     <span style={{ fontWeight: "bold" }}>{t("Ghế")}: </span>
                     {bookingDetailQuery.data.seatNumber}
                   </Typography>
-                {/* Thông tin dịch vụ gửi hàng đi kèm */}
-                {bookingDetailQuery?.data?.bookingCargos?.length > 0 && (
+
+                  {/* Thông tin dịch vụ gửi hàng đi kèm */}
+                  {bookingDetailQuery?.data?.bookingCargos?.length > 0 && (
                     <Box
                       display="flex"
                       flexDirection="column"
@@ -374,6 +386,19 @@ const MyTicket = () => {
                           </Box>
                         )
                       )}
+                      <Box display="flex" justifyContent="center" mt={2}>
+                        <QRCodeCanvas
+                          value={JSON.stringify({
+                            ticketId: selectedTicket,
+                            passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
+                            departureDateTime:
+                              bookingDetailQuery.data.trip.departureDateTime,
+                            seatNumber: bookingDetailQuery.data.seatNumber,
+                            totalPayment: bookingDetailQuery.data.totalPayment,
+                          })}
+                          size={100}
+                        />
+                      </Box>
                     </Box>
                   )}
                 </Box>
@@ -456,7 +481,9 @@ const MyTicket = () => {
                     variant="outlined"
                     type="text"
                     label={t("Địa chỉ đón")}
-                    value={formatLocation(bookingDetailQuery.data.trip.pickUpLocation)}
+                    value={formatLocation(
+                      bookingDetailQuery.data.trip.pickUpLocation
+                    )}
                     name="pickUpLocation"
                     InputProps={{
                       readOnly: true,
@@ -472,7 +499,9 @@ const MyTicket = () => {
                     variant="outlined"
                     type="text"
                     label={t("Địa chỉ trả")}
-                    value={formatLocation(bookingDetailQuery.data.trip.dropOffLocation)}
+                    value={formatLocation(
+                      bookingDetailQuery.data.trip.dropOffLocation
+                    )}
                     name="dropOffLocation"
                     InputProps={{
                       readOnly: true,

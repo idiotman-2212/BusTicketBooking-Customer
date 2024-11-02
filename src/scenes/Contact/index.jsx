@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Fab, Menu, MenuItem, Tooltip, Box, useTheme } from "@mui/material";
+import { Fab, Menu, MenuItem, Tooltip, Box, useTheme, useMediaQuery } from "@mui/material";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import { ColorModeContext, tokens } from "../../theme";
 import { useTranslation } from "react-i18next";
@@ -8,9 +8,10 @@ const Contact = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
+  const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const { t } = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -21,8 +22,7 @@ const Contact = () => {
   };
 
   return (
-    <Box sx={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
-      {/* Nút Liên hệ (Fab) */}
+    <Box sx={{ position: "fixed", bottom: isMobile ? 10 : 20, right: isMobile ? 10 : 20, zIndex: 1000 }}>
       <Tooltip title={t("Liên hệ")}>
         <Fab
           color="primary"
@@ -30,13 +30,14 @@ const Contact = () => {
           onClick={handleClick}
           sx={{
             backgroundColor: theme.palette.background.primary,
+            width: isMobile ? 48 : 56,
+            height: isMobile ? 48 : 56,
           }}
         >
-          <ContactSupportIcon />
+          <ContactSupportIcon fontSize={isMobile ? "small" : "medium"} />
         </Fab>
       </Tooltip>
 
-      {/* Menu dropup chứa các phương thức liên hệ */}
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -53,24 +54,24 @@ const Contact = () => {
           "& .MuiPaper-root": {
             borderRadius: "8px",
             boxShadow: "0px 4px 8px rgba(0,0,0,0.3)",
-            backgroundColor: theme.palette.background.primary, // Nền theo chế độ sáng/tối
+            backgroundColor: theme.palette.background.primary,
           },
         }}
       >
         {/* Zalo */}
-        <MenuItem onClick={handleClose} sx={{ padding: 2 }}>
+        <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
             src="/public/zalo.png"
             alt="Zalo"
-            style={{ width: 32, height: 32, marginRight: 16 }}
+            style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
           <a
             href="https://zalo.me/0326917158"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "18px",
-              color: theme.palette.text.primary, // Màu chữ theo chế độ sáng/tối
+              fontSize: isMobile ? "16px" : "18px",
+              color: theme.palette.text.primary,
               textDecoration: "none",
             }}
           >
@@ -79,18 +80,18 @@ const Contact = () => {
         </MenuItem>
 
         {/* Messenger */}
-        <MenuItem onClick={handleClose} sx={{ padding: 2 }}>
+        <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
             src="/public/messenger.png"
             alt="Messenger"
-            style={{ width: 32, height: 32, marginRight: 16 }}
+            style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
           <a
             href="https://m.me/idiotboy22122002"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "18px",
+              fontSize: isMobile ? "16px" : "18px",
               color: theme.palette.text.primary,
               textDecoration: "none",
             }}
@@ -100,18 +101,18 @@ const Contact = () => {
         </MenuItem>
 
         {/* SMS */}
-        <MenuItem onClick={handleClose} sx={{ padding: 2 }}>
+        <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
             src="/public/telephone.png"
             alt="SMS"
-            style={{ width: 32, height: 32, marginRight: 16 }}
+            style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
           <a
             href="sms:+84326917158"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "18px",
+              fontSize: isMobile ? "16px" : "18px",
               color: theme.palette.text.primary,
               textDecoration: "none",
             }}
@@ -121,18 +122,18 @@ const Contact = () => {
         </MenuItem>
 
         {/* Email */}
-        <MenuItem onClick={handleClose} sx={{ padding: 2 }}>
+        <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
             src="/public/email.png"
             alt="Email"
-            style={{ width: 32, height: 32, marginRight: 16 }}
+            style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
           <a
             href="mailto:abclsdjf23@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "18px",
+              fontSize: isMobile ? "16px" : "18px",
               color: theme.palette.text.primary,
               textDecoration: "none",
             }}

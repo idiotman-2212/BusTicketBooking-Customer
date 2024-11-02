@@ -1,4 +1,3 @@
-// src/scenes/Report/index.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -10,6 +9,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  useMediaQuery,
+  Skeleton,
 } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import {
@@ -23,17 +24,24 @@ import {
   Legend,
 } from "chart.js";
 import { useTranslation } from "react-i18next";
-import { getMonthlyPointsReport, getWeeklyPointsReport, getYearlyPointsReport } from "../../queries/report/reportQueries";
+import {
+  getMonthlyPointsReport,
+  getWeeklyPointsReport,
+  getYearlyPointsReport,
+} from "../../queries/report/reportQueries";
+import { useTheme } from "@mui/material/styles";
 
 // Đăng ký các scale và các thành phần cần thiết
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Report = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Kiểm tra màn hình nhỏ
   const [loading, setLoading] = useState(true);
   const [reportData, setReportData] = useState(null);
   const [error, setError] = useState(null);
-  const [timeFrame, setTimeFrame] = useState("monthly"); // Mặc định là monthly
+  const [timeFrame, setTimeFrame] = useState("monthly");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +50,7 @@ const Report = () => {
       try {
         let data;
         if (timeFrame === "monthly") {
-          data = await getMonthlyPointsReport(); // Lấy dữ liệu theo tháng
+          data = await getMonthlyPointsReport();
         } else if (timeFrame === "weekly") {
           data = await getWeeklyPointsReport();
         } else {
@@ -59,7 +67,6 @@ const Report = () => {
     fetchData();
   }, [timeFrame]);
 
-  // Dữ liệu biểu đồ
   const chartData = {
     labels: reportData ? Object.keys(reportData) : [],
     datasets: [
@@ -82,21 +89,21 @@ const Report = () => {
 
   return (
     <Box p={3} bgcolor="background.default" color="text.primary">
-      <Paper elevation={3} sx={{ padding: 3, marginBottom: 2 }}>
-        <Typography variant="h4" fontWeight="bold" marginBottom={2}>
+      <Paper elevation={3} sx={{ padding: isMobile ? 2 : 3, marginBottom: 2 }}>
+        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold" marginBottom={2}>
           {t("Báo Cáo Điểm Xu")}
         </Typography>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center">
-            <CircularProgress />
+            <Skeleton variant="rectangular" width="100%" height={300} />
           </Box>
         ) : error ? (
           <Typography color="error">{error}</Typography>
         ) : (
           <Box>
             <Line data={chartData} />
-            <Box mt={2} display="flex" justifyContent="flex-end">
-              <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+            <Box mt={2} display="flex" justifyContent="space-between" alignItems="center" flexDirection={isMobile ? "column" : "row"}>
+              <FormControl variant="outlined" sx={{ minWidth: 120, mb: isMobile ? 2 : 0 }}>
                 <InputLabel id="time-frame-select-label">{t("Chọn Thời Gian")}</InputLabel>
                 <Select
                   labelId="time-frame-select-label"
@@ -109,7 +116,17 @@ const Report = () => {
                   <MenuItem value="yearly">{t("Báo Cáo Theo Năm")}</MenuItem>
                 </Select>
               </FormControl>
-              <Button variant="contained" color="primary" onClick={() => window.history.back()} sx={{ ml: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => window.history.back()}
+                sx={{
+                  padding: isMobile ? "8px 16px" : "10px 20px",
+                  fontSize: isMobile ? "14px" : "16px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                }}
+              >
                 {t("Quay Lại")}
               </Button>
             </Box>

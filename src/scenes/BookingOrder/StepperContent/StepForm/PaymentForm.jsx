@@ -452,15 +452,14 @@ const PaymentForm = ({
                   }}
                 >
                   {t("Tôi đã đọc và đồng ý với các quy định của nhà xe.")}{" "}
-                  <Link 
-                  href="#" 
-                  onClick={onOpenRegulations}
-                  sx={{
-      fontWeight: "bold",            // In đậm liên kết
-      color: theme.palette.primary.main, // Đổi màu liên kết
-      textDecoration: "underline",   // Gạch chân liên kết
-    }}
-
+                  <Link
+                    href="#"
+                    onClick={onOpenRegulations}
+                    sx={{
+                      fontWeight: "bold", // In đậm liên kết
+                      color: theme.palette.primary.main, // Đổi màu liên kết
+                      textDecoration: "underline", // Gạch chân liên kết
+                    }}
                   >
                     {t("Nội quy của nhà xe")}
                   </Link>
@@ -468,10 +467,10 @@ const PaymentForm = ({
               }
             />
 
-            <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, mb: 1 }}>
               {t("Chọn dịch vụ bổ sung")}
             </Typography>
-            <Box sx={{ maxHeight: 200, overflowY: "auto", mb: 2 }}>
+            <Box sx={{ maxHeight: 200, overflowY: "auto", mb: 1 }}>
               {cargos?.map((cargo) => (
                 <Card key={cargo.id} variant="outlined" sx={{ mb: 1, p: 1 }}>
                   <Grid container alignItems="center" spacing={2}>
@@ -499,7 +498,7 @@ const PaymentForm = ({
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 4 }} />
+        <Divider sx={{ my: 2 }} />
 
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={6}>
@@ -549,16 +548,16 @@ const PaymentForm = ({
           )}
         </Grid>
 
-        <Typography variant="h6" fontWeight="bold" sx={{ mt: 4, mb: 2 }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
           {t("Tổng tiền cần thanh toán")}: {formatCurrency(finalTotalPayment)}
         </Typography>
 
         {/* Countdown Timer Display */}
-        <Typography variant="h6" color="error" sx={{ mt: 2, mb: 2 }}>
+        <Typography variant="h6" color="error" sx={{ mt: 2, mb: 1 }}>
           {t("Thời gian còn lại để thanh toán")}: {formatTime(timeLeft)}
         </Typography>
 
-        <FormControl component="fieldset" sx={{ mt: 2 }}>
+        <FormControl component="fieldset" sx={{ mt: 1 }}>
           <FormLabel component="legend">
             {t("Phương thức thanh toán")}
           </FormLabel>

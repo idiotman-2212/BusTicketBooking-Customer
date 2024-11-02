@@ -18,6 +18,7 @@ import { tokens } from "../../theme";
 import { APP_CONSTANTS } from "../../utils/appContants";
 import { messages } from "../../utils/validationMessages";
 import { useTranslation } from "react-i18next";
+import { QRCodeCanvas } from "qrcode.react";
 
 const getFormattedPaymentDateTime = (paymentDateTime) => {
   return format(
@@ -420,6 +421,19 @@ const BookingSearch = () => {
                           </Box>
                         )
                       )}
+                      <Box display="flex" justifyContent="center" mt={2}>
+                        <QRCodeCanvas
+                          value={JSON.stringify({
+                            ticketId: selectedTicket,
+                            passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
+                            departureDateTime:
+                              bookingDetailQuery.data.trip.departureDateTime,
+                            seatNumber: bookingDetailQuery.data.seatNumber,
+                            totalPayment: bookingDetailQuery.data.totalPayment,
+                          })}
+                          size={100}
+                        />
+                      </Box>
                     </Box>
                   )}
                 </Box>
