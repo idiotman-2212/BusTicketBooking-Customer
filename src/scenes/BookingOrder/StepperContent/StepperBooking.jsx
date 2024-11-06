@@ -1,6 +1,12 @@
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Typography, useTheme, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
@@ -19,7 +25,6 @@ import { useTranslation } from "react-i18next";
 import { ColorModeContext, tokens } from "../../../theme";
 import { useContext } from "react";
 import Regulation from "../../Regulation";
-
 
 const initialValues = {
   id: -1,
@@ -46,7 +51,7 @@ const initialValues = {
   cvv: "", // used to validate when paymentMethod is CARD, remove when submit
   isEditMode: false, // remove this field when submit
   pointsUsed: 0, // Thêm trường pointsUsed
-  cargoRequests: [], 
+  cargoRequests: [],
   hasReadRegulations: false,
 };
 
@@ -92,20 +97,18 @@ const renderStepContent = (
   }
 };
 
-const steps = ["Chọn chuyến", "Chọn chỗ", "Thanh toán"];
-
 const StepperBooking = () => {
+  const { t } = useTranslation();
+  const steps = [t("Chọn chuyến"), t("Chọn chỗ"), t("Thanh toán")];
   const [activeStep, setActiveStep] = useState(0);
   const [bookingData, setBookingData] = useState(initialValues);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
-  const {t} = useTranslation(); 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
   const [showRegulations, setShowRegulations] = useState(false);
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
 
   const handleOpenRegulations = () => {
     setShowRegulations(true);
@@ -142,10 +145,10 @@ const StepperBooking = () => {
       ...newValues
     } = values;
 
-      // Cập nhật totalPayment và pointsUsed từ bookingData
-      newValues.totalPayment = bookingData.totalPayment; // Sử dụng giá trị đã cập nhật
-      newValues.pointsUsed = bookingData.pointsUsed; // Sử dụng giá trị đã cập nhật
-      newValues.cargoRequests = bookingData.cargoRequests;
+    // Cập nhật totalPayment và pointsUsed từ bookingData
+    newValues.totalPayment = bookingData.totalPayment; // Sử dụng giá trị đã cập nhật
+    newValues.pointsUsed = bookingData.pointsUsed; // Sử dụng giá trị đã cập nhật
+    newValues.cargoRequests = bookingData.cargoRequests;
 
     actions.setSubmitting(false);
 
@@ -156,7 +159,12 @@ const StepperBooking = () => {
       },
       onError: (error) => {
         console.log(error);
-        handleToast("error", error.response?.data?.message);
+        if (error.response?.status === 400) { // Giả sử mã lỗi 409 là do ghế đã bị đặt
+          handleToast("error", t("Chỗ ngồi đã được đặt, vui lòng chọn chỗ khác."));
+          setActiveStep(1); // Quay lại bước chọn chỗ ngồi
+        } else {
+          handleToast("error", error.response?.data?.message || t("Đặt vé không thành công. Vui lòng thử lại."));
+        }
       },
     });
 
@@ -176,16 +184,19 @@ const StepperBooking = () => {
   };
 
   return (
-    <Box 
-    m="0"
-    p={isSmallScreen ? "10px" : "20px"}
-    bgcolor={theme.palette.background.default} // Màu nền từ theme
-    color={theme.palette.text.primary} // Màu chữ từ theme
+    <Box
+      m="0"
+      p={isSmallScreen ? "10px" : "20px"}
+      bgcolor={theme.palette.background.default} // Màu nền từ theme
+      color={theme.palette.text.primary} // Màu chữ từ theme
     >
       {/* <Header title={undefined} subTitle={"CREATE BOOKING"} /> */}
 
       <Box mt="100px">
-      <Stepper activeStep={activeStep} orientation={isSmallScreen ? "vertical" : "horizontal"}>
+        <Stepper
+          activeStep={activeStep}
+          orientation={isSmallScreen ? "vertical" : "horizontal"}
+        >
           {steps.map((label, index) => (
             <Step key={index}>
               <StepLabel>{label}</StepLabel>
@@ -211,17 +222,22 @@ const StepperBooking = () => {
           >
             {({ isSubmitting, handleSubmit, ...rest }) => (
               <form onSubmit={handleSubmit}>
-              <Box m={isSmallScreen ? "10px 0" : "20px 0"}>
+                <Box m={isSmallScreen ? "10px 0" : "20px 0"}>
                   {renderStepContent(
                     activeStep,
                     rest,
                     setActiveStep,
                     bookingData,
                     setBookingData,
-                    handleOpenRegulations 
+                    handleOpenRegulations
                   )}
                 </Box>
-                <Box mt="20px" display="flex" flexDirection={isSmallScreen ? "column" : "row"} justifyContent="center">
+                <Box
+                  mt="20px"
+                  display="flex"
+                  flexDirection={isSmallScreen ? "column" : "row"}
+                  justifyContent="center"
+                >
                   {activeStep !== 0 && (
                     <Button
                       disableElevation
@@ -237,7 +253,10 @@ const StepperBooking = () => {
                   <LoadingButton
                     disableElevation
                     disableRipple
-                    sx={{ marginLeft: isSmallScreen ? "0" : "auto", width: isSmallScreen ? "100%" : "auto" }}
+                    sx={{
+                      marginLeft: isSmallScreen ? "0" : "auto",
+                      width: isSmallScreen ? "100%" : "auto",
+                    }}
                     color="success"
                     type="submit"
                     variant="contained"

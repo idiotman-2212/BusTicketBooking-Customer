@@ -1,5 +1,5 @@
 import SquareIcon from "@mui/icons-material/Square";
-import { Box, Typography, useTheme, useMediaQuery  } from "@mui/material";
+import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React, {
   memo,
@@ -221,12 +221,13 @@ const CoachModel = (props) => {
               // mb={2}
               color={colors.greenAccent[400]}
             >
-              {stair === "DOWN_STAIR" ? "Tầng dưới" : stair === "UP_STAIR" ? "Tầng trên" : ""}
+              {stair === "DOWN_STAIR"
+                ? t("Tầng dưới")
+                : stair === "UP_STAIR"
+                ? t("Tầng trên")
+                : ""}
             </Typography>
-            <Box
-              display="grid"
-              gridTemplateColumns="repeat(3, minmax(0, 1fr))"
-            >
+            <Box display="grid" gridTemplateColumns="repeat(3, minmax(0, 1fr))">
               {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
                 <SeatModel
                   key={seatNumber}
@@ -253,11 +254,12 @@ const CoachModel = (props) => {
       >
         <Box gridColumn="span 12" textAlign="center" mb="20px">
           <Typography variant="h6" color="error">
-            {`Thời gian giữ ghế còn lại: ${Math.floor(timeLeft / 60)}:${
-              timeLeft % 60
-            }`}
+            {`${t("Thời gian giữ ghế còn lại")}: ${Math.floor(timeLeft / 60)}:${
+              timeLeft % 60 < 10 ? "0" : ""
+            }${timeLeft % 60}`}
           </Typography>
         </Box>
+
         <Box>
           <Typography variant="h5">
             <span style={{ fontWeight: "bold" }}>

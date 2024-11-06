@@ -11,7 +11,7 @@ import {
   submitReview,
   getReviewByTripId,
 } from "../../queries/review/reviewQueries";
-import * as reviewQueries from "../../queries/review/reviewQueries"; 
+import * as reviewQueries from "../../queries/review/reviewQueries";
 import {
   IconButton,
   Badge,
@@ -172,46 +172,48 @@ const Notification = () => {
     setTripIdForReview(tripId);
 
     try {
-        // Kiểm tra xem người dùng đã đánh giá chuyến đi chưa
-        const hasReviewed = await reviewQueries.getReviewByTripIdAndUsername(tripId, localStorage.getItem('loggedInUsername'));
-        
-        if (hasReviewed) {
-            alert("Bạn đã đánh giá chuyến đi này rồi.");
-            return; // Không hiển thị form đánh giá nữa
-        }
+      // Kiểm tra xem người dùng đã đánh giá chuyến đi chưa
+      const hasReviewed = await reviewQueries.getReviewByTripIdAndUsername(
+        tripId,
+        localStorage.getItem("loggedInUsername")
+      );
 
-        setDriverRating(5);
-        setCoachRating(5);
-        setTripRating(5);
-        // Mở modal đánh giá chuyến đi
-        setOpenReviewModal(true);
+      if (hasReviewed) {
+        alert("Bạn đã đánh giá chuyến đi này rồi.");
+        return; // Không hiển thị form đánh giá nữa
+      }
+
+      setDriverRating(5);
+      setCoachRating(5);
+      setTripRating(5);
+      // Mở modal đánh giá chuyến đi
+      setOpenReviewModal(true);
     } catch (error) {
-        console.error("Error checking review status:", error);
+      console.error("Error checking review status:", error);
     }
-};
+  };
 
+  const handleSubmitReview = async () => {
+    const username = localStorage.getItem("loggedInUsername");
+    const tripId = tripIdForReview;
 
-const handleSubmitReview = async () => {
-  const username = localStorage.getItem('loggedInUsername');
-  const tripId = tripIdForReview;
-
-  if (!tripId || !username) {
+    if (!tripId || !username) {
       alert("Vui lòng kiểm tra lại thông tin chuyến đi và đăng nhập.");
       return;
-  }
+    }
 
-  const reviewData = {
+    const reviewData = {
       tripId: tripId,
       username: username,
       driverRating,
       coachRating,
       tripRating,
       comment,
-  };
+    };
 
-  console.log("Review Data to be submitted:", reviewData); // Debug dữ liệu trước khi submit
+    console.log("Review Data to be submitted:", reviewData); // Debug dữ liệu trước khi submit
 
-  try {
+    try {
       await submitReview(reviewData); // Gửi đánh giá đến backend
       alert(t("Review submitted successfully!"));
       setOpenReviewModal(false);
@@ -220,17 +222,18 @@ const handleSubmitReview = async () => {
       setCoachRating(0);
       setTripRating(0);
       setComment("");
-  } catch (error) {
-      if (error.response?.status === 400 && error.response?.data?.message === "You have already reviewed this trip.") {
-          alert("Bạn đã đánh giá chuyến đi này rồi.");
+    } catch (error) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.message === "You have already reviewed this trip."
+      ) {
+        alert("Bạn đã đánh giá chuyến đi này rồi.");
       } else {
-          alert(t("Failed to submit review."));
+        alert(t("Failed to submit review."));
       }
       console.error("Error submitting review", error);
-  }
-};
-
-
+    }
+  };
 
   return (
     <Box>
@@ -265,7 +268,7 @@ const handleSubmitReview = async () => {
               <ListItemText
                 primary={
                   <Typography variant="body1" style={{ fontWeight: 500 }}>
-                    {notification.title || t("No title")}
+                    {notification.title || t("Không có tiêu đề")}
                   </Typography>
                 }
                 secondary={
@@ -279,7 +282,7 @@ const handleSubmitReview = async () => {
         ) : (
           <MenuItem disabled>
             <Typography fontSize="13px" fontWeight="bold" variant="body2">
-              {t("No new notifications")}
+              {t("Không có thông báo mới")}
             </Typography>
           </MenuItem>
         )}
@@ -287,12 +290,12 @@ const handleSubmitReview = async () => {
         <Box>
           <MenuItem onClick={handleViewRecentClick}>
             <Button variant="outlined" color="secondary">
-              View recent notifications
+              {t("Thông báo gần đây")}
             </Button>
           </MenuItem>
           <MenuItem onClick={handleViewAllClick}>
             <Button variant="outlined" color="secondary">
-              View all notifications
+              {t("Tất cả thông báo")}
             </Button>
           </MenuItem>
         </Box>
@@ -311,7 +314,7 @@ const handleSubmitReview = async () => {
             color: theme.palette.common.white,
           }}
         >
-          {t("Recent Notifications")}
+          {t("Thông báo gần đây")}
         </DialogTitle>
         <DialogContent>
           {loadingRecent ? (
@@ -341,7 +344,7 @@ const handleSubmitReview = async () => {
                       fontSize="13px"
                       style={{ fontWeight: "bold" }}
                     >
-                      {notification.title || t("No title")}
+                      {notification.title || t("Không có tiêu đề")}
                     </Typography>
                   }
                   subheader={
@@ -364,7 +367,7 @@ const handleSubmitReview = async () => {
                         color="success"
                         onClick={() => handleTripReview(notification.tripId)}
                       >
-                        Đánh giá chuyến đi
+                        {t("Đánh giá chuyến đi")}
                       </Button>
                     )}
                   </Typography>
@@ -377,7 +380,7 @@ const handleSubmitReview = async () => {
               </Card>
             ))
           ) : (
-            <Typography>{t("No notifications found.")}</Typography>
+            <Typography>{t("Không tìm thấy thông báo nào")}</Typography>
           )}
         </DialogContent>
         <DialogActions
@@ -395,7 +398,7 @@ const handleSubmitReview = async () => {
             variant="contained"
             color="error"
           >
-            {t("Close")}
+            {t("Đóng")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -413,7 +416,7 @@ const handleSubmitReview = async () => {
             color: theme.palette.common.white,
           }}
         >
-          {t("All Notifications")}
+          {t("Tất cả thông báo")}
         </DialogTitle>
         <DialogContent>
           {loadingAll ? (
@@ -443,7 +446,7 @@ const handleSubmitReview = async () => {
                       fontSize="13px"
                       style={{ fontWeight: "bold" }}
                     >
-                      {notification.title || t("No title")}
+                      {notification.title || t("Không có tiêu đề")}
                     </Typography>
                   }
                   subheader={
@@ -466,7 +469,7 @@ const handleSubmitReview = async () => {
                         color="success"
                         onClick={() => handleTripReview(notification.tripId)}
                       >
-                        Đánh giá chuyến đi
+                        {t("Đánh giá chuyến đi")}
                       </Button>
                     )}
                   </Typography>
@@ -479,7 +482,7 @@ const handleSubmitReview = async () => {
               </Card>
             ))
           ) : (
-            <Typography>{t("No notifications found.")}</Typography>
+            <Typography>{t("Không tìm thấy thông báo nào")}</Typography>
           )}
         </DialogContent>
         <DialogActions
@@ -497,7 +500,7 @@ const handleSubmitReview = async () => {
             variant="contained"
             color="error"
           >
-            {t("Close")}
+            {t("Đóng")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -510,7 +513,7 @@ const handleSubmitReview = async () => {
         maxWidth="md"
       >
         <DialogTitle>
-          {selectedNotification?.title || t("No title")}
+          {selectedNotification?.title || t("Không có tiêu đề")}
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2">
@@ -534,84 +537,108 @@ const handleSubmitReview = async () => {
             variant="contained"
             color="error"
           >
-            {t("Close")}
+            {t("Đóng")}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Modal đánh giá chuyến đi */}
-      <Dialog open={openReviewModal} onClose={() => setOpenReviewModal(false)} fullWidth maxWidth="sm">
-    <DialogTitle textAlign='center'  variant="h4" sx={{ fontWeight: 'bold' }}>{t("Rate Your Trip")}</DialogTitle>
-    <DialogContent>
-        <Card variant="outlined" sx={{ padding: 2 }}>
+      <Dialog
+        open={openReviewModal}
+        onClose={() => setOpenReviewModal(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle
+          textAlign="center"
+          variant="h4"
+          sx={{ fontWeight: "bold" }}
+        >
+          {t("Đánh giá chuyến đi của bạn")}
+        </DialogTitle>
+        <DialogContent>
+          <Card variant="outlined" sx={{ padding: 2 }}>
             <CardContent>
-                {/* Đánh giá lái xe */}
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t("Driver Rating")}</Typography>
-                <Box display="flex" justifyContent="center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <IconButton key={star} onClick={() => setDriverRating(star)}>
-                            {star <= driverRating ? (
-                                <StarIcon sx={{ color: "#FFD700" }} />
-                            ) : (
-                                <StarBorderIcon sx={{ color: "#FFD700" }} />
-                            )}
-                        </IconButton>
-                    ))}
-                </Box>
-                <Divider sx={{ marginY: 2 }} />
+              {/* Đánh giá lái xe */}
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                {t("Xếp hạng tài xế")}
+              </Typography>
+              <Box display="flex" justifyContent="center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <IconButton key={star} onClick={() => setDriverRating(star)}>
+                    {star <= driverRating ? (
+                      <StarIcon sx={{ color: "#FFD700" }} />
+                    ) : (
+                      <StarBorderIcon sx={{ color: "#FFD700" }} />
+                    )}
+                  </IconButton>
+                ))}
+              </Box>
+              <Divider sx={{ marginY: 2 }} />
 
-                {/* Đánh giá xe khách */}
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t("Coach Rating")}</Typography>
-                <Box display="flex" justifyContent="center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <IconButton key={star} onClick={() => setCoachRating(star)}>
-                            {star <= coachRating ? (
-                                <StarIcon sx={{ color: "#FFD700" }} />
-                            ) : (
-                                <StarBorderIcon sx={{ color: "#FFD700" }} />
-                            )}
-                        </IconButton>
-                    ))}
-                </Box>
-                <Divider sx={{ marginY: 2 }} />
+              {/* Đánh giá xe khách */}
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                {t("Xếp hạng chuyến xe")}
+              </Typography>
+              <Box display="flex" justifyContent="center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <IconButton key={star} onClick={() => setCoachRating(star)}>
+                    {star <= coachRating ? (
+                      <StarIcon sx={{ color: "#FFD700" }} />
+                    ) : (
+                      <StarBorderIcon sx={{ color: "#FFD700" }} />
+                    )}
+                  </IconButton>
+                ))}
+              </Box>
+              <Divider sx={{ marginY: 2 }} />
 
-                {/* Đánh giá chuyến đi */}
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t("Trip Rating")}</Typography>
-                <Box display="flex" justifyContent="center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <IconButton key={star} onClick={() => setTripRating(star)}>
-                            {star <= tripRating ? (
-                                <StarIcon sx={{ color: "#FFD700" }} />
-                            ) : (
-                                <StarBorderIcon sx={{ color: "#FFD700" }} />
-                            )}
-                        </IconButton>
-                    ))}
-                </Box>
+              {/* Đánh giá chuyến đi */}
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                {t("Xếp hạng chuyến đi")}
+              </Typography>
+              <Box display="flex" justifyContent="center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <IconButton key={star} onClick={() => setTripRating(star)}>
+                    {star <= tripRating ? (
+                      <StarIcon sx={{ color: "#FFD700" }} />
+                    ) : (
+                      <StarBorderIcon sx={{ color: "#FFD700" }} />
+                    )}
+                  </IconButton>
+                ))}
+              </Box>
 
-                {/* TextField cho nhận xét */}
-                <TextField
-                    label={t("Comments")}
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    sx={{ marginTop: 2 }}
-                />
+              {/* TextField cho nhận xét */}
+              <TextField
+                label={t("Nhận xét")}
+                fullWidth
+                multiline
+                rows={4}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                sx={{ marginTop: 2 }}
+              />
             </CardContent>
-        </Card>
-    </DialogContent>
-    <DialogActions>
-        <Button onClick={() => setOpenReviewModal(false)} variant="contained" color="error">
-            {t("Cancel")}
-        </Button>
-        <Button onClick={handleSubmitReview} variant="contained" color="success">
-            {t("Submit Review")}
-        </Button>
-    </DialogActions>
-</Dialog>
-
+          </Card>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenReviewModal(false)}
+            variant="contained"
+            color="error"
+          >
+            {t("Hủy")}
+          </Button>
+          <Button
+            onClick={handleSubmitReview}
+            variant="contained"
+            color="success"
+          >
+            {t("Gửi đánh giá")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
