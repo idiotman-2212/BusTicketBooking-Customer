@@ -40,6 +40,9 @@ const Regulation = ({ open, onClose }) => {
           - {t("Phí hủy vé sẽ được áp dụng nếu hủy vé trong thời gian quy định.")}
         </Typography>
         <Typography variant="body1" paragraph>
+          - {t("Nếu quý khách muốn hoàn tiền vé đặt thì cần phải tới quầy để xác nhận với nhân viên.")}
+        </Typography>
+        <Typography variant="body1" paragraph>
           - {t("Mọi thông tin cá nhân của khách hàng sẽ được bảo mật tuyệt đối.")}
         </Typography>
       </DialogContent>
