@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import * as userApi from "../../queries/user/userQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -111,6 +112,7 @@ const UserSettings = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode); // Sử dụng token màu từ theme
   const colorMode = useContext(ColorModeContext);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const userInfoQuery = useQuery({
     queryKey: ["users", loggedInUsername],
@@ -137,18 +139,19 @@ const UserSettings = () => {
   };
 
   return (
-    <Box mt="100px"
-     display="flex"
-    justifyContent="center"
-    // bgcolor={theme.palette.background.default} // Màu nền từ theme
-    //   color={theme.palette.text.primary} // Màu chữ từ theme
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="600px"
+      px={isMobile ? 2 : 0}
     >
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexDirection="column"
-        gap="20px"
+        width={isMobile ? "100%" : "70%"}
+        p={isMobile ? 2 : 4}
+        bgcolor={colors.primary[400]}
+        borderRadius={2}
+        boxShadow={3}
       >
         <Formik
           onSubmit={handleFormSubmit}

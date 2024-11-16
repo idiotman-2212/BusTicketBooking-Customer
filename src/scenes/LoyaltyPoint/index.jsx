@@ -167,7 +167,7 @@ const LoyaltyPoint = () => {
       bgcolor={theme.palette.background.default} // Màu nền từ theme
       color={theme.palette.text.primary} // Màu chữ từ theme
     >
-      <Paper elevation={3} sx={{ padding: isMobile ? 2 : 3, marginBottom: 2 }}>
+      <Paper elevation={3} sx={{ padding: isMobile ? 3 : 3, marginBottom: 2 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center"> {/* Sử dụng Flexbox */}
         <Box>
           <Typography

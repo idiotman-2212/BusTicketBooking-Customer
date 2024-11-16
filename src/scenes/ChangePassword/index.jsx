@@ -21,7 +21,8 @@ import {
   IconButton,
   FormHelperText,
   Button,
-  useTheme
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -49,7 +50,9 @@ const ChangePassword = () => {
   const colorMode = useContext(ColorModeContext);
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
-  const {t}  = useTranslation();
+  const { t } = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const loggedInUsername = localStorage.getItem("loggedInUsername");
   const changePwdMutation = useMutation({
     mutationFn: (changePwdRequest) => authApi.changePwd(changePwdRequest),
@@ -77,6 +80,7 @@ const ChangePassword = () => {
       justifyContent="center"
       alignItems="center"
       height="500px"
+      px={isMobile ? 2 : 0}
     >
       <Formik
         onSubmit={handleChangePasswordSubmit}
@@ -97,14 +101,15 @@ const ChangePassword = () => {
             <Box
               display="grid"
               gap="30px"
-              width="400px"
-              p="20px"
+              width={isMobile ? "100%" : "400px"}
+              p={isMobile ? 2 : 4}
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
               bgcolor={colors.primary[400]}
               borderRadius="8px"
+              boxShadow={3}
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
-                <Typography variant="h2" fontWeight="bold">
+                <Typography variant="h3" fontWeight="bold">
                   {t("Đổi mật khẩu")}
                 </Typography>
               </Box>

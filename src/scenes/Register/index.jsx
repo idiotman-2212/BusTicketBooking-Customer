@@ -18,7 +18,8 @@ import {
   IconButton,
   FormHelperText,
   Button,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -84,6 +85,7 @@ const Register = () => {
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const {t} = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // create register mutation
   const registerMutation = useMutation({
@@ -113,7 +115,8 @@ const Register = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      height="600px"
+      minHeight="40vh"
+      px={isMobile ? 2 : 0} 
     >
       <Formik
         onSubmit={handleFormSubmit}
@@ -133,12 +136,12 @@ const Register = () => {
           <form onSubmit={handleSubmit}>
             <Box
               display="grid"
-              gap="30px"
-              width="400px"
-              p="20px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+              gap="20px"
+              width={isMobile ? "100%" : "400px"} // Điều chỉnh chiều rộng
+              p={isMobile ? 2 : 3}
               bgcolor={colors.primary[400]}
               borderRadius="8px"
+              boxShadow={3}
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">

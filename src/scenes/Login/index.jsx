@@ -11,7 +11,8 @@ import {
   OutlinedInput,
   TextField,
   Typography,
-  useTheme
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { Formik } from "formik";
@@ -60,6 +61,7 @@ const Login = () => {
   const location = useLocation();
   const isLoggedIn = useLogin();
   const {t} = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const loginMutation = useMutation({
     mutationFn: (authReq) => authApi.login(authReq),
@@ -94,6 +96,7 @@ const Login = () => {
       justifyContent="center"
       alignItems="center"
       height="500px"
+      px={isMobile ? 2 : 0}
     >
       <Formik
         onSubmit={handleFormSubmit}
@@ -114,11 +117,12 @@ const Login = () => {
             <Box
               display="grid"
               gap="30px"
-              width="400px"
-              p="20px"
+              width={isMobile ? "300px" : "400px"} // Điều chỉnh kích thước cho responsive
+              p={isMobile ? "10px" : "20px"}
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
               bgcolor={colors.primary[400]}
               borderRadius="8px"
+              boxShadow={3}
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">

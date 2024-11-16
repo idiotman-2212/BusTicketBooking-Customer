@@ -126,7 +126,7 @@ const Topbar = () => {
             alignItems="center"
             gap="4px"
           >
-            <Typography fontWeight="bold" variant="h5">
+             <Typography fontWeight="bold" variant={isMobile ? "h6" : "h5"}>
               DATVEXE
             </Typography>
             <Box width="30px" height="30px">
@@ -140,7 +140,7 @@ const Topbar = () => {
                 }}
               />
             </Box>
-            <Typography fontWeight="bold" variant="h5">
+            <Typography fontWeight="bold" variant={isMobile ? "h6" : "h5"}>
               GIARE
             </Typography>
           </Box>

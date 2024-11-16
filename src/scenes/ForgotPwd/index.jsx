@@ -7,7 +7,15 @@ import { APP_CONSTANTS } from "../../utils/appContants";
 import * as authApi from "../../queries/auth/authQueries";
 import { tokens } from "../../theme";
 import { Link, useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, colors } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  colors,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../utils/helpers";
 import { useTranslation } from "react-i18next";
@@ -34,9 +42,11 @@ const forotSchema = yup.object().shape({
 });
 
 const ForgotPwd = () => {
-  const colors = tokens();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const forgotPwdMutation = useMutation({
     mutationFn: (email) => authApi.forgot(email),
@@ -61,6 +71,7 @@ const ForgotPwd = () => {
       justifyContent="center"
       alignItems="center"
       height="500px"
+      px={isMobile ? 2 : 0} 
     >
       <Formik
         onSubmit={handleForgotSubmit}
@@ -79,13 +90,13 @@ const ForgotPwd = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
-              display="grid"
-              gap="30px"
-              width="400px"
-              p="20px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+               display="grid"
+              gap="20px"
+              width={isMobile ? "100%" : "400px"} // Điều chỉnh chiều rộng
+              p={isMobile ? 2 : 3}
               bgcolor={colors.primary[400]}
               borderRadius="8px"
+              boxShadow={3} // Hiệu ứng bóng
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
