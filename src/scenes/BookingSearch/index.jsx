@@ -390,43 +390,38 @@ const BookingSearch = () => {
                       <Typography variant="h5" fontWeight="bold">
                         {t("Dịch vụ gửi hàng đi kèm")}
                       </Typography>
-                      {bookingDetailQuery.data.bookingCargos.map(
-                        (cargoItem, index) => (
-                          <Box
-                            key={index}
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="center"
-                            alignItems="center"
-                            mt="10px"
-                            sx={{
-                              padding: "10px",
-                              backgroundColor: colors.primary[400],
-                              borderRadius: "8px",
-                              width: "100%",
-                            }}
-                          >
-                            <Typography variant="h6">
-                              <span style={{ fontWeight: "bold" }}>
-                                {t("Tên dịch vụ")}:{" "}
-                              </span>
-                              {cargoItem.cargo.name}
-                            </Typography>
-                            <Typography variant="h6">
-                              <span style={{ fontWeight: "bold" }}>
-                                {t("Số lượng")}:{" "}
-                              </span>
-                              {cargoItem.quantity}
-                            </Typography>
-                            <Typography variant="h6">
-                              <span style={{ fontWeight: "bold" }}>
-                                {t("Giá dịch vụ")}:{" "}
-                              </span>
-                              {formatCurrency(cargoItem.price)}
-                            </Typography>
-                          </Box>
-                        )
-                      )}
+                      {bookingDetailQuery?.data?.bookingCargos
+  ?.filter((cargoItem) => cargoItem.quantity > 0)
+  ?.map((cargoItem, index) => (
+    <Box
+      key={index}
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      mt="10px"
+      sx={{
+        padding: "10px",
+        backgroundColor: colors.primary[400],
+        borderRadius: "8px",
+        width: "100%",
+      }}
+    >
+      <Typography variant="h6">
+        <span style={{ fontWeight: "bold" }}>{t("Tên dịch vụ")}: </span>
+        {cargoItem.cargo.name}
+      </Typography>
+      <Typography variant="h6">
+        <span style={{ fontWeight: "bold" }}>{t("Số lượng")}: </span>
+        {cargoItem.quantity}
+      </Typography>
+      <Typography variant="h6">
+        <span style={{ fontWeight: "bold" }}>{t("Giá dịch vụ")}: </span>
+        {formatCurrency(cargoItem.price)}
+      </Typography>
+    </Box>
+  ))}
+
                       <Box display="flex" justifyContent="center" mt={2}>
                         <QRCodeCanvas
                           value={JSON.stringify({
