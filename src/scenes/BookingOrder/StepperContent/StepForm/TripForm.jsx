@@ -84,14 +84,14 @@ const getDiscountedPriceDisplay = (trip) => {
     <Box display="flex" alignItems="center">
       {originalPrice !== finalPrice && (
         <Typography
-          variant="body2"
-          color="textSecondary"
-          sx={{ textDecoration: "line-through", marginRight: "8px" }}
+          variant="body1"
+          color="error"
+          sx={{ textDecoration: "line-through", marginRight: "4px" }}
         >
           {formatCurrency(originalPrice)}
         </Typography>
       )}
-      <Typography variant="h5" color="error">
+      <Typography variant="h5" color="primary">
         {formatCurrency(finalPrice)}
       </Typography>
     </Box>
@@ -743,7 +743,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           display="flex"
                           alignItems="center"
                           justifyContent="space-between"
-                          gap="6px"
+                          gap="3px"
                           mt="20px"
                           p="6px 10px"
                           borderRadius="30px"

@@ -10,6 +10,8 @@ import Paragraph from "../../global/Paragraph";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@emotion/react";
 import Regulation from "../Regulation"; // Import Regulation component
+import { useNavigate } from "react-router-dom";
+import RecommendationModal from "../RecommendTrip"; // Import RecommendationModal component
 
 const LandingPage = () => {
   const theme = useTheme();
@@ -17,6 +19,8 @@ const LandingPage = () => {
   const colorMode = useContext(ColorModeContext);
   const { t } = useTranslation();
   const [openRegulations, setOpenRegulations] = useState(false);
+  const [openRecommendationModal, setOpenRecommendationModal] = useState(false); // State để mở/đóng modal
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Kiểm tra trạng thái "vừa đăng nhập" từ localStorage
@@ -28,11 +32,22 @@ const LandingPage = () => {
       setOpenRegulations(true);
       localStorage.removeItem("loggedIn"); // Xóa trạng thái "vừa đăng nhập" để tránh hiển thị lại modal
     }
+
+    // Mở RecommendationModal sau khi trang tải (hoặc kiểm tra điều kiện)
+    setOpenRecommendationModal(true); // Có thể thay đổi điều kiện hiển thị modal ở đây
   }, []);
 
   const handleRegulationsClose = () => {
     setOpenRegulations(false);
     localStorage.setItem("hasReadRegulations", "true"); // Lưu trạng thái đã đọc quy định
+  };
+
+  const handleImageClick = () => {
+    navigate("/booking");
+  };
+
+  const handleRecommendationModalClose = () => {
+    setOpenRecommendationModal(false); // Đóng modal khi người dùng đóng modal
   };
 
   return (
@@ -59,30 +74,35 @@ const LandingPage = () => {
           <img
             src="/bed_img1.jpg"
             style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+            onClick={handleImageClick}
           />
         </SwiperSlide>
         <SwiperSlide>
           <img
             src="/chair_img.jpg"
             style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+            onClick={handleImageClick}
           />
         </SwiperSlide>
         <SwiperSlide>
           <img
             src="/bed_img.jpg"
             style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+            onClick={handleImageClick}
           />
         </SwiperSlide>
         <SwiperSlide>
           <img
             src="/limousine_img.jpg"
             style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+            onClick={handleImageClick}
           />
         </SwiperSlide>
         <SwiperSlide>
           <img
             src="/limousine_img1.jpg"
             style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+            onClick={handleImageClick}
           />
         </SwiperSlide>
       </Swiper>
@@ -110,6 +130,9 @@ const LandingPage = () => {
         />
       </Box>
 
+      {/* Hiển thị RecommendationModal khi openRecommendationModal là true */}
+      {openRecommendationModal && <RecommendationModal onClose={handleRecommendationModalClose} />}
+      
       {/* Gọi component Regulation và điều khiển mở/đóng modal từ LandingPage */}
       <Regulation open={openRegulations} onClose={handleRegulationsClose} />
     </Box>

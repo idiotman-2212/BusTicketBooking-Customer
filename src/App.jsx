@@ -70,9 +70,8 @@ const App = () => {
                       <Route path="/report" element={<Report />} />
                       <Route path="/my_loyalty" element={<LoyaltyPoint />} />
                       <Route path="booking" element={<BookingOrder />} />
+                      <Route path="booking-search" element={<BookingSearch />} />
                     </Route>
-                    
-                    <Route path="booking-search" element={<BookingSearch />} />
                     <Route path="*" element={<LandingPage />} />
                   </Route>
                 </Routes>
