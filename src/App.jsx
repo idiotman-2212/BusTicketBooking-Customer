@@ -22,6 +22,8 @@ import "./utils/i18n"; // import file cấu hình i18n
 import LoyaltyPoint from "./scenes/LoyaltyPoint";
 import Contact from "./scenes/Contact";
 import Report from "./scenes/Report";
+import Footer from "./scenes/Footer";
+import RefundConfirmation from "./scenes/RefundConfirmation";
 
 const ProtectedRoutes = () => {
   const isLoggedIn = useLogin();
@@ -73,6 +75,7 @@ const App = () => {
                       <Route path="booking-search" element={<BookingSearch />} />
                     </Route>
                     <Route path="*" element={<LandingPage />} />
+                    <Route path="/refund/confirm/:bookingId" element={<RefundConfirmation />} />
                   </Route>
                 </Routes>
               </Container>

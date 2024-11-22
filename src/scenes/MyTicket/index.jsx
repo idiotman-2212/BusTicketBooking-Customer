@@ -99,8 +99,10 @@ const MyTicket = () => {
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
         return { title: t("Đã hủy vé"), color: "error" };
+        case "REFUND_PENDING":
+        return { title: t("Đang chờ hoàn tiền"), color: "info" };
       case "REFUNDED":
-        return { title: t("Đã hoàn tiền"), color: "info" };
+        return { title: t("Đã hoàn tiền"), color: "primary" };
     }
   };
 
@@ -113,6 +115,8 @@ const MyTicket = () => {
         return t("Đã thanh toán");
       case "CANCEL":
         return t("Đã hủy vé");
+        case "REFUND_PENDING":
+        return t("Đang chờ hoàn tiền");
       case "REFUNDED":
         return t("Đã hoàn tiền");
     }

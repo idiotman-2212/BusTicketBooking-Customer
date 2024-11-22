@@ -12,6 +12,7 @@ import { useTheme } from "@emotion/react";
 import Regulation from "../Regulation"; // Import Regulation component
 import { useNavigate } from "react-router-dom";
 import RecommendationModal from "../RecommendTrip"; // Import RecommendationModal component
+import Footer from "../Footer";
 
 const LandingPage = () => {
   const theme = useTheme();
