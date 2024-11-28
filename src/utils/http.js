@@ -21,4 +21,5 @@ http.interceptors.request.use((config) => {
     return Promise.reject(error);   
 })
 
+
 export { http }

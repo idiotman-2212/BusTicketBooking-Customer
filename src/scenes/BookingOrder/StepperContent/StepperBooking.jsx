@@ -163,7 +163,7 @@ const StepperBooking = () => {
           handleToast("error", t("Chỗ ngồi đã được đặt, vui lòng chọn chỗ khác."));
           setActiveStep(1); // Quay lại bước chọn chỗ ngồi
         } else {
-          handleToast("error", error.response?.data?.message || t("Đặt vé không thành công. Vui lòng thử lại."));
+          // handleToast("error", error.response?.data?.message || t("Đặt vé không thành công. Vui lòng thử lại."));
         }
       },
     });

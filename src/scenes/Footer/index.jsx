@@ -8,7 +8,7 @@ import {
   LocationOn,
   AccessTime
 } from '@mui/icons-material';
-import { Box, Container, Grid, Typography, Link, IconButton } from '@mui/material';
+import { Box, Grid, Typography, Link, IconButton } from '@mui/material';
 
 const Footer = () => {
   return (
@@ -18,10 +18,11 @@ const Footer = () => {
         color: 'white',
         pt: 6,
         pb: 3,
-        mt: 'auto'
+        mt: 'auto',
+        width: '100%', // Đảm bảo Footer chiếm toàn bộ chiều rộng màn hình
       }}
     >
-      <Container maxWidth="lg">
+      <Box sx={{ maxWidth: '1280px', margin: '0 auto', px: 2 }}>
         <Grid container spacing={4}>
           {/* Thông tin công ty */}
           <Grid item xs={12} sm={6} md={3}>
@@ -165,7 +166,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Công ty Vận tải Xe khách. Tất cả quyền được bảo lưu.
           </Typography>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };
