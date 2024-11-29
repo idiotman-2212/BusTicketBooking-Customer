@@ -48,7 +48,7 @@ const formatCurrency = (amount) => {
 const BookingSearch = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [openModal, setOpenModal] = useState(false);
   const [searchPhone, setSearchPhone] = useState("");
   const [isInValidPhone, setIsInValidPhone] = useState(false);
@@ -123,10 +123,10 @@ const BookingSearch = () => {
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
         return { title: t("Đã hủy vé"), color: "error" };
-        case "REFUND_PENDING":
-          return { title: t("Đang chờ hoàn tiền"), color: "info" };
-        case "REFUNDED":
-          return { title: t("Đã hoàn tiền"), color: "primary" };
+      case "REFUND_PENDING":
+        return { title: t("Đang chờ hoàn tiền"), color: "info" };
+      case "REFUNDED":
+        return { title: t("Đã hoàn tiền"), color: "primary" };
     }
   };
 
@@ -139,7 +139,7 @@ const BookingSearch = () => {
         return t("Đã thanh toán");
       case "CANCEL":
         return t("Đã hủy vé");
-        case "REFUND_PENDING":
+      case "REFUND_PENDING":
         return t("Đang chờ hoàn tiền");
       case "REFUNDED":
         return t("Đã hoàn tiền");
@@ -160,7 +160,7 @@ const BookingSearch = () => {
       district ? ", " + district : ""
     }${province?.name ? ", " + province.name : ""}`;
   };
-  
+
   return (
     <Box mt="100px" display="flex" flexDirection="column" gap="20px">
       <Box
@@ -196,7 +196,9 @@ const BookingSearch = () => {
         filteredTickets.length !== 0 && !isInValidPhone ? (
           <Box
             display="grid"
-            gridTemplateColumns={isMobile ? "repeat(1, 1fr)" : "repeat(12, 1fr)"}
+            gridTemplateColumns={
+              isMobile ? "repeat(1, 1fr)" : "repeat(12, 1fr)"
+            }
             gap="30px"
             p={isMobile ? "20px" : "50px"}
             sx={{
@@ -345,7 +347,10 @@ const BookingSearch = () => {
           <Box display="flex" alignItems="center">
             {bookingDetailQuery?.data && (
               <>
-                <Box textAlign={isMobile ? "center" : "left"} width={isMobile ? "100%" : "auto"}>
+                <Box
+                  textAlign={isMobile ? "center" : "left"}
+                  width={isMobile ? "100%" : "auto"}
+                >
                   <Typography mb="40px" variant="h3" fontWeight="bold">
                     {t("THÔNG TIN VÉ ĐẶT")}
                   </Typography>
@@ -383,7 +388,7 @@ const BookingSearch = () => {
                   </Typography>
 
                   {/* Thông tin dịch vụ gửi hàng đi kèm */}
-                {bookingDetailQuery?.data?.bookingCargos?.length > 0 && (
+                  {bookingDetailQuery?.data?.bookingCargos?.length > 0 && (
                     <Box
                       display="flex"
                       flexDirection="column"
@@ -395,52 +400,58 @@ const BookingSearch = () => {
                         {t("Dịch vụ gửi hàng đi kèm")}
                       </Typography>
                       {bookingDetailQuery?.data?.bookingCargos
-  ?.filter((cargoItem) => cargoItem.quantity > 0)
-  ?.map((cargoItem, index) => (
-    <Box
-      key={index}
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      mt="10px"
-      sx={{
-        padding: "10px",
-        backgroundColor: colors.primary[400],
-        borderRadius: "8px",
-        width: "100%",
-      }}
-    >
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Tên dịch vụ")}: </span>
-        {cargoItem.cargo.name}
-      </Typography>
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Số lượng")}: </span>
-        {cargoItem.quantity}
-      </Typography>
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Giá dịch vụ")}: </span>
-        {formatCurrency(cargoItem.price)}
-      </Typography>
-    </Box>
-  ))}
-
-                      <Box display="flex" justifyContent="center" mt={2}>
-                        <QRCodeCanvas
-                          value={JSON.stringify({
-                            ticketId: selectedTicket,
-                            passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
-                            departureDateTime:
-                              bookingDetailQuery.data.trip.departureDateTime,
-                            seatNumber: bookingDetailQuery.data.seatNumber,
-                            totalPayment: bookingDetailQuery.data.totalPayment,
-                          })}
-                          size={isMobile ? 70 : 100}
-                        />
-                      </Box>
+                        ?.filter((cargoItem) => cargoItem.quantity > 0)
+                        ?.map((cargoItem, index) => (
+                          <Box
+                            key={index}
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            alignItems="center"
+                            mt="10px"
+                            sx={{
+                              padding: "10px",
+                              backgroundColor: colors.primary[400],
+                              borderRadius: "8px",
+                              width: "100%",
+                            }}
+                          >
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Tên dịch vụ")}:{" "}
+                              </span>
+                              {cargoItem.cargo.name}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Số lượng")}:{" "}
+                              </span>
+                              {cargoItem.quantity}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Giá dịch vụ")}:{" "}
+                              </span>
+                              {formatCurrency(cargoItem.price)}
+                            </Typography>
+                          </Box>
+                        ))}
                     </Box>
                   )}
+
+                  <Box display="flex" justifyContent="center" mt={2}>
+                    <QRCodeCanvas
+                      value={JSON.stringify({
+                        ticketId: selectedTicket,
+                        passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
+                        departureDateTime:
+                          bookingDetailQuery.data.trip.departureDateTime,
+                        seatNumber: bookingDetailQuery.data.seatNumber,
+                        totalPayment: bookingDetailQuery.data.totalPayment,
+                      })}
+                      size={isMobile ? 70 : 100}
+                    />
+                  </Box>
                 </Box>
                 <Box
                   display="grid"
@@ -521,7 +532,9 @@ const BookingSearch = () => {
                     variant="outlined"
                     type="text"
                     label={t("Địa chỉ đón")}
-                    value={formatLocation(bookingDetailQuery.data.trip.pickUpLocation)}
+                    value={formatLocation(
+                      bookingDetailQuery.data.trip.pickUpLocation
+                    )}
                     name="pickUpLocation"
                     InputProps={{
                       readOnly: true,
@@ -537,7 +550,9 @@ const BookingSearch = () => {
                     variant="outlined"
                     type="text"
                     label={t("Địa chỉ trả")}
-                    value={formatLocation(bookingDetailQuery.data.trip.dropOffLocation)}
+                    value={formatLocation(
+                      bookingDetailQuery.data.trip.dropOffLocation
+                    )}
                     name="dropOffLocation"
                     InputProps={{
                       readOnly: true,

@@ -99,7 +99,7 @@ const MyTicket = () => {
         return { title: t("Đã thanh toán"), color: "success" };
       case "CANCEL":
         return { title: t("Đã hủy vé"), color: "error" };
-        case "REFUND_PENDING":
+      case "REFUND_PENDING":
         return { title: t("Đang chờ hoàn tiền"), color: "info" };
       case "REFUNDED":
         return { title: t("Đã hoàn tiền"), color: "primary" };
@@ -115,7 +115,7 @@ const MyTicket = () => {
         return t("Đã thanh toán");
       case "CANCEL":
         return t("Đã hủy vé");
-        case "REFUND_PENDING":
+      case "REFUND_PENDING":
         return t("Đang chờ hoàn tiền");
       case "REFUNDED":
         return t("Đã hoàn tiền");
@@ -261,7 +261,11 @@ const MyTicket = () => {
                 color: colors.primary[500],
               }}
             />
-            <Typography color={colors.primary[500]} variant={isMobile ? "h4" : "h2"} fontWeight="bold">
+            <Typography
+              color={colors.primary[500]}
+              variant={isMobile ? "h4" : "h2"}
+              fontWeight="bold"
+            >
               {t("Không có kết quả")}
             </Typography>
           </Box>
@@ -353,52 +357,58 @@ const MyTicket = () => {
                         {t("Dịch vụ gửi hàng đi kèm")}
                       </Typography>
                       {bookingDetailQuery?.data?.bookingCargos
-  ?.filter((cargoItem) => cargoItem.quantity > 0)
-  ?.map((cargoItem, index) => (
-    <Box
-      key={index}
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      mt="10px"
-      sx={{
-        padding: "10px",
-        backgroundColor: colors.primary[400],
-        borderRadius: "8px",
-        width: "100%",
-      }}
-    >
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Tên dịch vụ")}: </span>
-        {cargoItem.cargo.name}
-      </Typography>
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Số lượng")}: </span>
-        {cargoItem.quantity}
-      </Typography>
-      <Typography variant="h6">
-        <span style={{ fontWeight: "bold" }}>{t("Giá dịch vụ")}: </span>
-        {formatCurrency(cargoItem.price)}
-      </Typography>
-    </Box>
-  ))}
-
-                      <Box display="flex" justifyContent="center" mt={2}>
-                        <QRCodeCanvas
-                          value={JSON.stringify({
-                            ticketId: selectedTicket,
-                            passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
-                            departureDateTime:
-                              bookingDetailQuery.data.trip.departureDateTime,
-                            seatNumber: bookingDetailQuery.data.seatNumber,
-                            totalPayment: bookingDetailQuery.data.totalPayment,
-                          })}
-                          size={100}
-                        />
-                      </Box>
+                        ?.filter((cargoItem) => cargoItem.quantity > 0)
+                        ?.map((cargoItem, index) => (
+                          <Box
+                            key={index}
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            alignItems="center"
+                            mt="10px"
+                            sx={{
+                              padding: "10px",
+                              backgroundColor: colors.primary[400],
+                              borderRadius: "8px",
+                              width: "100%",
+                            }}
+                          >
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Tên dịch vụ")}:{" "}
+                              </span>
+                              {cargoItem.cargo.name}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Số lượng")}:{" "}
+                              </span>
+                              {cargoItem.quantity}
+                            </Typography>
+                            <Typography variant="h6">
+                              <span style={{ fontWeight: "bold" }}>
+                                {t("Giá dịch vụ")}:{" "}
+                              </span>
+                              {formatCurrency(cargoItem.price)}
+                            </Typography>
+                          </Box>
+                        ))}
                     </Box>
                   )}
+
+                  <Box display="flex" justifyContent="center" mt={2}>
+                    <QRCodeCanvas
+                      value={JSON.stringify({
+                        ticketId: selectedTicket,
+                        passengerName: `${bookingDetailQuery.data.custFirstName} ${bookingDetailQuery.data.custLastName}`,
+                        departureDateTime:
+                          bookingDetailQuery.data.trip.departureDateTime,
+                        seatNumber: bookingDetailQuery.data.seatNumber,
+                        totalPayment: bookingDetailQuery.data.totalPayment,
+                      })}
+                      size={100}
+                    />
+                  </Box>
                 </Box>
                 <Box
                   display="grid"

@@ -361,7 +361,7 @@ const Notification = () => {
                   >
                     {notification.message}
                     {/* Nút đánh giá nếu là thông báo hoàn thành chuyến đi */}
-                    {notification.title === "Hoàn thành chuyến đi" && (
+                    {notification.title === "THÔNG BÁO HOÀN THÀNH CHUYẾN ĐI" && (
                       <Button
                         variant="contained"
                         color="success"
@@ -463,7 +463,7 @@ const Notification = () => {
                   >
                     {notification.message}
                     {/* Nút đánh giá nếu là thông báo hoàn thành chuyến đi */}
-                    {notification.title === "Hoàn thành chuyến đi" && (
+                    {notification.title === "THÔNG BÁO HOÀN THÀNH CHUYẾN ĐI" && (
                       <Button
                         variant="contained"
                         color="success"
