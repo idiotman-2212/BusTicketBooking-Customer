@@ -61,7 +61,7 @@ const Contact = () => {
         {/* Zalo */}
         <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
-            src="/public/zalo.png"
+            src="/zalo.png"
             alt="Zalo"
             style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
@@ -82,7 +82,7 @@ const Contact = () => {
         {/* Messenger */}
         <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
-            src="/public/messenger.png"
+            src="/messenger.png"
             alt="Messenger"
             style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
@@ -103,7 +103,7 @@ const Contact = () => {
         {/* SMS */}
         <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
-            src="/public/telephone.png"
+            src="/telephone.png"
             alt="SMS"
             style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />
@@ -124,7 +124,7 @@ const Contact = () => {
         {/* Email */}
         <MenuItem onClick={handleClose} sx={{ padding: isMobile ? 1 : 2 }}>
           <img
-            src="/public/email.png"
+            src="/email.png"
             alt="Email"
             style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, marginRight: 16 }}
           />

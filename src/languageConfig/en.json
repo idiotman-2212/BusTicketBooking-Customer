@@ -192,5 +192,10 @@
   "Dịch vụ gửi hàng đi kèm": "Additional Services",
   "Tên dịch vụ": "Service name",
   "Số lượng": "Quantity",
-  "Giá dịch vụ": "Service price"
+  "Giá dịch vụ": "Service price",
+  "Thời gian đến": "To",
+  "Thời gian đi" :"From",
+  "Chuyến đi được đề xuất cho bạn": "Recommended trip for you",
+  "Loại xe": "Coach Type",
+  "Nếu quý khách muốn hoàn tiền vé đặt thì cần phải tới quầy để xác nhận với nhân viên.": "If you want a refund for your ticket, you need to go to the counter to confirm with the staff."
 }

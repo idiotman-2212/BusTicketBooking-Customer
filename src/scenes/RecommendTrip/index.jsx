@@ -19,13 +19,16 @@ import CloseIcon from '@mui/icons-material/Close';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { http } from "../../utils/http";
+import { useTranslation } from "react-i18next";
 
 const RecommendationModal = ({ onClose }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+    const {t} = useTranslation();
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -72,7 +75,7 @@ const RecommendationModal = ({ onClose }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <TravelExploreIcon />
           <Typography variant="h6" fontWeight="bold">
-            Chuyến đi được đề xuất cho bạn
+            {t("Chuyến đi được đề xuất cho bạn")}
           </Typography>
         </Box>
         <IconButton 
@@ -145,24 +148,25 @@ const RecommendationModal = ({ onClose }) => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <DirectionsBusIcon fontSize="small" />
                       <Typography variant="body2">
-                        <strong>Loại xe:</strong> {trip.coachType}
+                        <strong>{t("Loại xe")}:</strong> {trip.coachType}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <LocationOnIcon fontSize="small" />
                       <Typography variant="body2">
-                        <strong>Điểm đón:</strong> {trip.pickUpLocation}
+                        <strong>{t("Điểm đón")}:</strong> {trip.pickUpLocation}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <LocationOnIcon fontSize="small" />
                       <Typography variant="body2">
-                        <strong>Điểm trả:</strong> {trip.dropOffLocation}
+                        <strong>{t("Điểm trả")}:</strong> {trip.dropOffLocation}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <AccessTimeIcon fontSize="small" />
                       <Typography variant="body2">
-                        <strong>Thời gian khởi hành:</strong>{" "}
+                        <strong>{t("Thời gian khởi hành")}:</strong>{" "}
                         {new Date(trip.departureDateTime).toLocaleString("vi-VN")}
                       </Typography>
                     </Box>

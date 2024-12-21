@@ -2,7 +2,9 @@ import axios from 'axios'
 
 const http = axios.create({
     //VPS
-    baseURL: 'http://localhost:8080/api/v1/',
+    baseURL: 'http://chauhuydien.id.vn/api/v1/',
+
+    //baseURL: 'http://localhost:8080/api/v1/',
 
     timeout: 20000, // 10s
     headers: {

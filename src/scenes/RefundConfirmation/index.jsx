@@ -13,6 +13,7 @@ import {
 import { Check, Error, AccessTime } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import * as bookingApi from "../../queries/booking/ticketQueries";
+import { confirmRefund } from "../../queries/refundConfirm/refundConfirmQueries";
 
 const RefundConfirmation = () => {
   const { bookingId } = useParams();
@@ -27,31 +28,19 @@ const RefundConfirmation = () => {
   });
 
   useEffect(() => {
-    const confirmRefund = async () => {
+    const confirmRefundAsync = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8080/api/v1/bookings/refund/confirm/${bookingId}`,
-          {
-            method: "POST",
-          }
-        );
-
-        if (response.ok) {
-          setStatus("success");
-          setMessage("Xác nhận hoàn tiền thành công.");
-        } else {
-          const errorData = await response.json();
-          setStatus("error");
-          setMessage(errorData.message || "Không thể xác nhận hoàn tiền.");
-        }
+        const response = await confirmRefund(bookingId); // Gọi hàm từ refundConfirmQueries.js
+        setStatus("success");
+        setMessage("Xác nhận hoàn tiền thành công.");
       } catch (error) {
         setStatus("error");
-        setMessage("Đã xảy ra lỗi không mong muốn.");
+        setMessage(error.message || "Không thể xác nhận hoàn tiền.");
       }
     };
 
     if (bookingId) {
-      confirmRefund(); // Gọi confirmRefund chỉ khi có bookingId
+      confirmRefundAsync(); // Gọi confirmRefundAsync chỉ khi có bookingId
     }
   }, [bookingId]);
 
@@ -67,7 +56,6 @@ const RefundConfirmation = () => {
         return null;
     }
   };
-
   const getBackgroundColor = () => {
     switch (status) {
       case "processing":

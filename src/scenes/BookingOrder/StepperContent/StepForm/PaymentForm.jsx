@@ -632,7 +632,7 @@ const PaymentForm = ({
                 {t("Thông tin thẻ Visa")}
               </Typography>
               <img
-                src="../../../../../public/visa.png"
+                src="/visa.png"
                 alt="Visa"
                 width="50"
                 style={{
